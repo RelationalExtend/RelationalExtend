@@ -1,0 +1,16 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        {{ theme:js slug="sample_js_file" }}
+        {{ theme:css slug="sample_css_file" }}
+        <title></title>
+    </head>
+    <body>
+        <ul>
+            {{ page:pages }}
+                <li>{{ page_title }}</li>
+            {{ /page:pages }}
+        </ul>
+    </body>
+</html>
