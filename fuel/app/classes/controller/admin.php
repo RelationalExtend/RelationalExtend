@@ -56,8 +56,8 @@ class Controller_Admin extends Controller_Template {
 
         $uri_string = explode('/', Uri::string());
 
-        if (count($uri_string) > 1 and $uri_string[0] == 'admin' and
-                ($uri_string[1] == 'login' or $uri_string[1] == 'signup'))
+        if (count($uri_string) > 2 and ($uri_string[0] == 'cms' and $uri_string[1] == 'cms') and
+                ($uri_string[2] == 'login' or $uri_string[2] == 'signup'))
         {
             $this->logged_in = false;
 
@@ -79,7 +79,7 @@ class Controller_Admin extends Controller_Template {
         else
         {
             $this->template->logged_in = false;
-            Response::redirect(Uri::base()."admin/login");
+            Response::redirect(Uri::base().$this->controller_path."login");
 
             $this->logged_in = false;
 
