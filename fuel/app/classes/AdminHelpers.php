@@ -14,6 +14,7 @@ class AdminHelpers {
      * @param array $buttons
      * @return string
      */
+
     public static function bootstrap_buttons($buttons = array())
     {
         $button_html = "";
@@ -122,5 +123,69 @@ class AdminHelpers {
     public static function save_and_exit_button_value()
     {
         return "Save and Exit";
+    }
+
+    /**
+     * Places pagination links
+     *
+     * @static
+     * @param $pagination_records
+     * @return mixed|string
+     */
+
+    public static function pagination_links($pagination_records)
+    {
+        $pagination_string = "<div class='pagination'>{{ pagination_links }}</div>";
+        $number_of_pages = intval($pagination_records->num_pages);
+        $current_page = intval($pagination_records->current_page);
+        $pagination_link = $pagination_records->pagination_link;
+        $pagination_size = intval($pagination_records->pagination_size);
+
+        $page_difference = $number_of_pages - $current_page;
+        $start_page = $number_of_pages - ($pagination_size - $page_difference);
+        $end_page = $start_page + ($pagination_size - $page_difference);
+
+        $previous_page = $current_page - 1;
+        $next_page = $current_page + 1;
+
+        if($previous_page < 1)
+        {
+            $previous_page = 1;
+        }
+
+        if($next_page > $number_of_pages)
+        {
+            $next_page = $number_of_pages;
+        }
+
+        if($start_page < 1)
+        {
+            $start_page = 1;
+        }
+
+        if($end_page > $number_of_pages)
+        {
+            $end_page = $number_of_pages;
+        }
+
+        $page_links_string = "";
+
+        $page_links_string.="<li><a href='".$pagination_link.$previous_page."'>&laquo;</a></li>";
+
+        for($page_loop = $start_page; $page_loop <= $end_page; $page_loop ++)
+        {
+            $link_to_page = $pagination_link.$page_loop;
+            if($page_loop != $current_page)
+                $page_links_string.="<li><a href='$link_to_page'>$page_loop</a></li>";
+            else
+                $page_links_string.="<li class='active'><a href='$link_to_page'>$page_loop</a></li>";
+        }
+
+        $page_links_string.="<li><a href='".$pagination_link.$next_page."'>&raquo;</a></li>";
+
+        $pagination_string = str_replace("{{ pagination_links }}", "<ul>".$page_links_string."</ul>",
+            $pagination_string);
+
+        return $pagination_string;
     }
 }

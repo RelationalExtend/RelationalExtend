@@ -11,11 +11,11 @@ namespace page;
 class Controller_Admin extends \cms\Controller_CMS {
     protected $controller_path = "page/admin/";
 
-    public function action_index()
+    public function action_index($page_number = 1)
     {
         $this->build_admin_interface(
             $this->build_admin_ui_tabular_list("Pages", "View and manage pages", Page_Setup::TABLE_PAGES,
-                "id", "page_title")
+                "id", "page_title", true, $page_number, 20)
         );
     }
 

@@ -27,6 +27,16 @@
         </tr>
     </table>
 
+<?php if($pagination_records->pagination_enabled) { ?>
+
+    <table class="table">
+        <tr>
+            <td><?php echo(AdminHelpers::pagination_links($pagination_records)); ?></td>
+        </tr>
+    </table>
+
+<?php } ?>
+
     <footer>
         <p class="pull-right">Page rendered in {exec_time}s using {mem_usage}mb of memory.</p>
         <p>

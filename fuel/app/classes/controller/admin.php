@@ -19,6 +19,11 @@ class Controller_Admin extends Controller_Template {
     const MENU_SETTINGS = "settings";
     const MENU_USERS = "users";
 
+    const PAGINATION_ENABLED = "pagination_enabled";
+    const PAGINATION_NUM_PAGES = "num_pages";
+    const PAGINATION_CURRENT_PAGE = "current_page";
+    const PAGINATION_LINK = "pagination_link";
+    const PAGINATION_SIZE = "pagination_size";
 
     const FUNC_ADMIN_SETTINGS = "admin_settings";
     const FUNC_ADMIN_NAVIGATION = "admin_navigation";
@@ -189,12 +194,16 @@ class Controller_Admin extends Controller_Template {
      * @param $table_name
      * @param $id_field
      * @param $description_field
+     * @param bool $paged
+     * @param int $page_number
+     * @param int $page_size
+     * @param null $action_name
      * @param null $order_by
      * @param string $direction
      * @return view content
      */
     protected function build_admin_ui_tabular_list($page_title, $page_content, $table_name, $id_field, $description_field,
-        $order_by = null, $direction = 'asc')
+        $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
     {
         // Tabular layout data here
 
@@ -203,6 +212,30 @@ class Controller_Admin extends Controller_Template {
 
         if($order_by != null)
             $records->order_by($order_by, $direction);
+
+        $pagination_records = new stdClass();
+        $pagination_records->{self::PAGINATION_ENABLED} = $paged;
+        $pagination_records->{self::PAGINATION_CURRENT_PAGE} = $page_number;
+
+        if($action_name != null)
+            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."$action_name/";
+        else
+            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."index/";
+        
+        $pagination_records->{self::PAGINATION_SIZE} = $page_size;
+
+        // Paged result
+
+        if($paged)
+        {
+            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name)->as_object()->execute();
+            $num_pages = ceil(($num_pages_query[0]->num_rows) / $page_size);
+
+            $records->limit($page_size);
+            $records->offset(($page_size * $page_number) - $page_size);
+
+            $pagination_records->{self::PAGINATION_NUM_PAGES} = $num_pages;
+        }
 
         $record_array = $records->as_object()->execute();
 
@@ -222,7 +255,7 @@ class Controller_Admin extends Controller_Template {
 
         $view = View::forge("admin/partials/table-view", array("table_rows" => $record_array,
              "page_title" => $page_title, "page_title_content" => $page_content,
-             "bottom_buttons" => $bottom_buttons));
+             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records));
 
         return $view;
     }

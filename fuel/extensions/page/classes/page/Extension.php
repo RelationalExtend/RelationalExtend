@@ -12,6 +12,7 @@ class Page_Extension implements \IExtension {
 
     /**
      * Execute the extension
+     * @param array $parameters
      * @return void
      */
 

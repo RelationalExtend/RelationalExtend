@@ -11,11 +11,11 @@ namespace blog;
 class Controller_Admin extends \cms\Controller_CMS {
     protected $controller_path = "blog/admin/";
 
-    public function action_index()
+    public function action_index($page_number = 1)
     {
         $this->build_admin_interface(
             $this->build_admin_ui_tabular_list("Blog Posts", "View and manage blog posts", Blog_Setup::TABLE_BLOG,
-                "id", "blog_title")
+                "id", "blog_title", true, $page_number, 20)
         );
     }
 
