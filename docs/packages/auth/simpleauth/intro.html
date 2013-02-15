@@ -174,25 +174,9 @@
 			<h3 id="database">Database table</h3>
 
 			<p>
-				SimpleAuth relies on a single table. Here is the SQL to create it:
+				SimpleAuth relies on a single table. The Auth package contains a migration file in the examples folder for this table.
+				Just copy it to your migrations folder, and run <code>oil refine migrate</code> to have the table created for you.
 			</p>
-
-			<pre class="sql"><code>CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `group` int(11) NOT NULL DEFAULT '1',
-  `email` varchar(255) NOT NULL,
-  `last_login` varchar(25) NOT NULL,
-  `login_hash` varchar(255) NOT NULL,
-  `profile_fields` text NOT NULL,
-  `created` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `updated` int(11) NOT NULL DEFAULT '0',
-  `dateclosed` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`,`email`)
-)</code></pre>
 
 			<h3 id="example">Example</h3>
 
@@ -232,7 +216,7 @@
 
 		<footer>
 			<p>
-				&copy; FuelPHP Development Team 2010-2012 - <a href="http://fuelphp.com">FuelPHP</a> is released under the MIT license.
+				&copy; FuelPHP Development Team 2010-2013 - <a href="http://fuelphp.com">FuelPHP</a> is released under the MIT license.
 			</p>
 		</footer>
 	</div>
