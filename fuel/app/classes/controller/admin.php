@@ -42,6 +42,7 @@ class Controller_Admin extends Controller_Template {
     protected $is_abstract_controller = true;
 
     protected $controller_path = "admin/";
+    protected $action_path = null;
     protected $default_admin_extension_path = "admin/";
 
     // Admin layout
@@ -194,6 +195,7 @@ class Controller_Admin extends Controller_Template {
      * @param $table_name
      * @param $id_field
      * @param $description_field
+     * @param string $return_path
      * @param bool $paged
      * @param int $page_number
      * @param int $page_size
@@ -203,7 +205,7 @@ class Controller_Admin extends Controller_Template {
      * @return view content
      */
     protected function build_admin_ui_tabular_list($page_title, $page_content, $table_name, $id_field, $description_field,
-        $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
+        $return_path = "", $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
     {
         // Tabular layout data here
 
@@ -243,19 +245,24 @@ class Controller_Admin extends Controller_Template {
 
         foreach($record_array as $key => $record_array_item)
         {
-            $btn_edit = $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field, "Edit");
+            $btn_edit = (trim($return_path) == "") ?
+                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field, "Edit") :
+                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field."/$return_path", "Edit");
             $btn_delete = $this->build_bootstrap_button("delete/$table_name/".$record_array_item->id_field, "Delete");
 
             $record_array[$key]->buttons = array($btn_edit, $btn_delete);
         }
 
         $bottom_buttons = array(
-            "btn_add" => $this->build_bootstrap_button("edit/$table_name/0", "Add new")
+            "btn_add" => (trim($return_path) == "") ?
+                    $this->build_bootstrap_button("edit/$table_name/0", "Add new") :
+                    $this->build_bootstrap_button("edit/$table_name/0/$return_path", "Add new")
         );
 
         $view = View::forge("admin/partials/table-view", array("table_rows" => $record_array,
              "page_title" => $page_title, "page_title_content" => $page_content,
-             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records));
+             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
+             "return_path" => $return_path));
 
         return $view;
     }
@@ -268,9 +275,11 @@ class Controller_Admin extends Controller_Template {
      * @param $table_slug
      * @param $form_action
      * @param int $record_id
+     * @param string $return_path
      * @return view content
      */
-    protected function build_admin_ui_form_view($page_title, $page_content, $table_slug, $form_action, $record_id = 0)
+    protected function build_admin_ui_form_view($page_title, $page_content, $table_slug, $form_action,
+        $record_id = 0, $return_path = "")
     {
         // Record view data here
 
@@ -288,7 +297,7 @@ class Controller_Admin extends Controller_Template {
         $view = View::forge("admin/partials/record-view", array("page_rows" => $object_meta_data,
                     "record_id" => $record_id, "page_title" => $page_title, "page_title_content" => $page_content,
                     "form_action" => Uri::base().$this->controller_path.$form_action, "object" => $table_slug,
-                    "record" => $record));
+                    "record" => $record, "return_path" => $return_path));
 
         return $view;
     }
@@ -488,11 +497,12 @@ class Controller_Admin extends Controller_Template {
      *
      * @param $table
      * @param int $record_id
+     * @param string $return_path
      * @param string $success_string
      * @return void
      */
 
-    public function action_edit($table, $record_id = 0, $success_string = "")
+    public function action_edit($table, $record_id = 0, $return_path = "", $success_string = "")
     {
         // Default edit interface
 
@@ -513,7 +523,7 @@ class Controller_Admin extends Controller_Template {
         $page_content = View::forge($view, array("action" => $action, "table" => $table));
 
         $this->build_admin_interface(
-            $this->build_admin_ui_form_view($page_title, $page_content, $table, "update", $record_id)
+            $this->build_admin_ui_form_view($page_title, $page_content, $table, "update", $record_id, $return_path)
         );
     }
 
@@ -568,6 +578,9 @@ class Controller_Admin extends Controller_Template {
                     $value_to_set = trim(Input::post($object_meta_data_item->object_meta_slug));
                     break;
                 case DBFieldMeta::CONTROL_LIST:
+                    $value_to_set = Input::post($object_meta_data_item->object_meta_slug);
+                    break;
+                case DBFieldMeta::CONTROL_TABULAR_LIST:
                     $value_to_set = Input::post($object_meta_data_item->object_meta_slug);
                     break;
                 case DBFieldMeta::CONTROL_CHECKBOX:
@@ -626,10 +639,18 @@ class Controller_Admin extends Controller_Template {
         if($save_value != false || $save_and_exit_value != false) {
             if($save_and_exit_value) {
                 $redirect_url = Uri::base().$this->controller_path;
+
+                if(trim(Input::post("return_path")) != "")
+                {
+                    if(trim(Input::post("return_path")) != "null") {
+                        $redirect_url = $redirect_url."/".ltrim(Input::post("return_path"), "/");
+                    }
+                }
+
                 Response::redirect($redirect_url);
             }
             elseif($save_value) {
-                $redirect_url = strpos($url_from, "/success", $strlen_url_from - 8) == FALSE ? "$url_from/success" : $url_from;
+                $redirect_url = strpos($url_from, "/null/success", $strlen_url_from - 8) == FALSE ? "$url_from/null/success" : $url_from;
                 Response::redirect($redirect_url);
             }
         }

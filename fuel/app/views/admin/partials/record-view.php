@@ -8,6 +8,7 @@
             <form action="<?php echo($form_action); ?>" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="record_id" value="<?php echo($record_id); ?>"/>
                 <input type="hidden" name="object" value="<?php echo($object); ?>"/>
+                <input type="hidden" name="return_path" value="<?php echo($return_path); ?>"/>
 <?php
 
     $num_rows = count($page_rows);

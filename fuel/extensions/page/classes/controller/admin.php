@@ -15,7 +15,7 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         $this->build_admin_interface(
             $this->build_admin_ui_tabular_list("Pages", "View and manage pages", Page_Setup::TABLE_PAGES,
-                "id", "page_title", true, $page_number, 20)
+                "id", "page_title", "", true, $page_number, 20)
         );
     }
 

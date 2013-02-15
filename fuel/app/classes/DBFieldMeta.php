@@ -22,6 +22,7 @@ class DBFieldMeta {
     const CONTROL_MULTI_TEXT = "multitext";
     const CONTROL_RICH_EDIT = "richedit";
     const CONTROL_LIST = "list";
+    const CONTROL_TABULAR_LIST = "external_list";
     const CONTROL_HIDDEN = "hidden";
     const CONTROL_CHECKBOX = "checkbox";
     const CONTROL_FILE = "file";

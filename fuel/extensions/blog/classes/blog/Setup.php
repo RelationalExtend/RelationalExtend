@@ -11,6 +11,7 @@ namespace blog;
 class Blog_Setup extends \ExtensionSetup implements \ISetup {
 
     const TABLE_BLOG = "blog";
+    const TABLE_CATEGORIES = "blog_categories";
 
     /**
      * Install the extension
@@ -22,11 +23,16 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
     {
         $tables = array();
 
+        // Main blog table
+
         $meta_data[self::META_TABLE_NAME] = self::TABLE_BLOG;
 
         $meta_data[self::META_FIELDS] = array(
             new \DBFieldMeta("Blog title", "blog_title", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_SIMPLE_TEXT, ""),
+            new \DBFieldMeta("Blog cover image", "blog_cover_image", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_FILE, ""),
             new \DBFieldMeta("Blog slug","blog_slug", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_HIDDEN, ""),
+            new \DBFieldMeta("Blog category","blog_category", \DBFieldMeta::FIELD_BIGINT, 0, \DBFieldMeta::CONTROL_TABULAR_LIST,
+                "table=".self::TABLE_CATEGORIES."|id_field=id|description_field=blog_category"),
             new \DBFieldMeta("Blog summary","blog_summary", \DBFieldMeta::FIELD_TEXT, 0, \DBFieldMeta::CONTROL_RICH_EDIT, ""),
             new \DBFieldMeta("Blog content","blog_content", \DBFieldMeta::FIELD_TEXT, 0, \DBFieldMeta::CONTROL_RICH_EDIT, ""),
             new \DBFieldMeta("Blog post creation time","blog_post_creation_time", \DBFieldMeta::FIELD_TIMESTAMP, 0, \DBFieldMeta::CONTROL_HIDDEN, ""),
@@ -39,6 +45,18 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
         );
 
         $tables[] = $meta_data;
+
+        // Categories table
+
+        $meta_data[self::META_TABLE_NAME] = self::TABLE_CATEGORIES;
+
+        $meta_data[self::META_FIELDS] = array(
+            new \DBFieldMeta("Blog category", "blog_category", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_SIMPLE_TEXT, ""),
+        );
+
+        $tables[] = $meta_data;
+
+        // Build the setup
 
         $blog_info = new Blog_Info();
 
@@ -56,7 +74,7 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
 
     public function uninstall_extension($extension_id)
     {
-        $tables = array(self::TABLE_BLOG);
+        $tables = array(self::TABLE_BLOG, self::TABLE_CATEGORIES);
         parent::uninstall($extension_id, $tables);
     }
 }
