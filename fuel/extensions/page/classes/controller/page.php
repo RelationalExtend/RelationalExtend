@@ -9,7 +9,7 @@
 namespace page;
  
 class Controller_Page extends \Controller_Public {
-    public function action_index($page_slug)
+    public function action_index($page_slug = "")
     {
         return $this->render_layout("main_layout_file", array("page_slug" => $page_slug));
     }

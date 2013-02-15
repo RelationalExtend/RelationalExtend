@@ -20,9 +20,13 @@ class Testtheme_Info extends \ThemeInfo implements \IInfo  {
     {
         $this->build_theme_data("Test theme", "Built on Twitter Bootstrap", "", time(), "1.0");
         $this->build_theme_layout_data("layout.html", "Main layout file", "", 0);
-        $this->build_theme_partial_data("partial.html", "Main partial file", "", 0);
-        $this->build_theme_javascript_data("bootstrap.js", "Sample JS file", "");
-        $this->build_theme_style_data("bootstrap.css", "Sample CSS file", "");
+        $this->build_theme_layout_data("blog-layout.html", "Blog layout file", "", 0);
+        $this->build_theme_layout_data("blog-post-layout.html", "Blog post layout file", "", 0);
+        $this->build_theme_partial_data("navigation.html", "Navigation", "", 0);
+        $this->build_theme_partial_data("html-head.html", "HTML Head", "", 0);
+        $this->build_theme_javascript_data("bootstrap.js", "Bootstrap", "");
+        $this->build_theme_style_data("bootstrap.css", "Bootstrap", "");
+        $this->build_theme_style_data("bootstrap-responsive.css", "Bootstrap Responsive", "");
 
         return array(\CMSTheme::THEME_PREFIX => $this->theme_data,
             \CMSTheme::LAYOUT_PREFIX => $this->layout_data,

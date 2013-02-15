@@ -11,7 +11,10 @@ namespace page;
 class Page {
     public static function get_pages()
     {
-        $pages = \Fuel\Core\DB::select("*")->from(Page_Setup::TABLE_PAGES)->execute()->as_array();
+        $pages = \Fuel\Core\DB::select("*")->from(Page_Setup::TABLE_PAGES)
+                ->where("page_status", "=", "Live")
+                ->and_where("page_active", "=", 1)
+                ->execute()->as_array();
 
         return $pages;
     }
@@ -19,7 +22,10 @@ class Page {
     public static function get_page_by_slug($slug)
     {
         $pages = \Fuel\Core\DB::select("*")->from(Page_Setup::TABLE_PAGES)
-                ->where("page_slug", "=", $slug)->execute()->as_array();
+                ->where("page_slug", "=", $slug)
+                ->and_where("page_status", "=", "Live")
+                ->and_where("page_active", "=", 1)
+                ->execute()->as_array();
 
         return $pages;
     }

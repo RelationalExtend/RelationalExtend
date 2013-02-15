@@ -18,17 +18,20 @@
                     </a>
                     <a class="brand" href="#">RelationalCMS</a>
                     <div class="nav-collapse">
-                        <ul class="nav">
-                            {{ theme:partial slug="navigation" }}
-                        </ul>
+                        {{ theme:partial slug="navigation" }}
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <h1>{{ page_heading }}</h1>
-            <p>{{ page_content }}</p>
+            <h1>Blog posts</h1>
+
+            {{ blog:posts }}
+                <h2><a href="http://localhost:8888/relationalcms-fuel/public/blog/blog/post/{{ post_url }}">{{ blog_title }}</a></h2>
+                <p>{{ blog_summary }}</p>
+                <hr/>
+            {{ /blog:posts }}
         </div>
     </body>
 </html>
