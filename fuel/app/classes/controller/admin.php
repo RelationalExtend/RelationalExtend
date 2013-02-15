@@ -547,6 +547,8 @@ class Controller_Admin extends Controller_Template {
 
         $database_array = array();
 
+        // Process each field
+
         foreach($object_meta_data as $object_meta_data_item)
         {
             $value_to_set = "";
@@ -578,13 +580,46 @@ class Controller_Admin extends Controller_Template {
                         $skip_control = true;
                     }
                     break;
+                case DBFieldMeta::CONTROL_FILE:
+                    $value_to_set = ($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK) ?
+                            $_FILES[$object_meta_data_item->object_meta_slug]["name"] : "";
+                    break;
             }
 
             if(!$skip_control)
                 $database_array[$object_meta_data_item->object_meta_slug] = $value_to_set;
         }
 
-        $update_object->set($database_array)->execute();
+        // Save records and get record ids
+
+        $insert_id = 0;
+        $rows_affected = 0;
+
+        if($record_id > 0)
+        {
+            $rows_affected = $update_object->set($database_array)->execute();
+            $insert_id = $record_id;
+        }
+        else {
+            list($insert_id, $rows_affected) = $update_object->set($database_array)->execute();
+        }
+
+        // Process and upload files afresh with their new destination names
+
+        foreach($object_meta_data as $object_meta_data_item)
+        {
+            if($object_meta_data_item->{Extension_ObjectMeta::SEGMENT_OBJECT_META_CONTROL} == DBFieldMeta::CONTROL_FILE)
+            {
+                if($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK)
+                {
+                    $uploaded_file = $_FILES[$object_meta_data_item->object_meta_slug]["tmp_name"];
+                    $file_name = $_FILES[$object_meta_data_item->object_meta_slug]["name"];
+                    move_uploaded_file($uploaded_file, UPLOADPATH.$insert_id."_".$file_name);
+                }
+            }
+        }
+
+        // Finalize
 
         $strlen_url_from = strlen($url_from);
 

@@ -97,6 +97,9 @@ class AdminHelpers {
             case DBFieldMeta::CONTROL_RICH_EDIT:
                 $return_string = "<textarea class='ckeditor' cols='80' name='$control_name' rows='10'>$values</textarea>";
                 break;
+            case DBFieldMeta::CONTROL_FILE:
+                $return_string = "<input type='file' name='$control_name' />";
+                break;
         }
 
         return $return_string == null? "" : "<p>$return_string</p>";

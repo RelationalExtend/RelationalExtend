@@ -24,6 +24,7 @@ class DBFieldMeta {
     const CONTROL_LIST = "list";
     const CONTROL_HIDDEN = "hidden";
     const CONTROL_CHECKBOX = "checkbox";
+    const CONTROL_FILE = "file";
 
     public $field_name;
     public $field_slug;

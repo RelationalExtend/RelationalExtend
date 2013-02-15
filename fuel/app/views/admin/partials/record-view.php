@@ -5,7 +5,7 @@
     </div>
     <div class="row">
         <div class="span12">
-            <form action="<?php echo($form_action); ?>" method="post">
+            <form action="<?php echo($form_action); ?>" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="record_id" value="<?php echo($record_id); ?>"/>
                 <input type="hidden" name="object" value="<?php echo($object); ?>"/>
 <?php
