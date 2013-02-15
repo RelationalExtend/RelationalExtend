@@ -18,7 +18,7 @@ class Plugin_Theme {
     public static function js($attributes, $content)
     {
         $slug = $attributes["slug"];
-
+        
         return "<script type='text/javascript' src='".Uri::base()."segments/js/".$slug."'></script>";
     }
 
@@ -35,7 +35,7 @@ class Plugin_Theme {
     {
         $slug = $attributes["slug"];
 
-        return "<link rel='stylesheet' href='".Uri::base()."segments/css/".$slug."' />";
+        return "<link rel='stylesheet' href='".Uri::base()."segments/css/".$slug."'>";
     }
 
     /**

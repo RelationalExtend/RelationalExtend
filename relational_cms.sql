@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 24, 2013 at 03:59 PM
+-- Generation Time: Feb 15, 2013 at 04:30 PM
 -- Server version: 5.5.25
 -- PHP Version: 5.4.4
 
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `theme_javascript` (
   `theme_js_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `theme_js_name` varchar(100) NOT NULL,
   `theme_js_slug` varchar(100) NOT NULL,
-  `theme_js_content` text NOT NULL,
+  `theme_js_content` longtext NOT NULL,
   `theme_js_theme_id` bigint(20) NOT NULL,
   PRIMARY KEY (`theme_js_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `theme_layouts` (
   `theme_layout_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `theme_layout_name` varchar(100) NOT NULL,
   `theme_layout_slug` varchar(100) NOT NULL,
-  `theme_layout_content` text NOT NULL,
+  `theme_layout_content` longtext NOT NULL,
   `theme_layout_active` int(11) NOT NULL DEFAULT '1',
   `theme_layout_default` int(11) NOT NULL DEFAULT '0',
   `theme_layout_last_edit_time` bigint(20) NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `theme_partials` (
   `theme_partial_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `theme_partial_name` varchar(100) NOT NULL,
   `theme_partial_slug` varchar(100) NOT NULL,
-  `theme_partial_content` text NOT NULL,
+  `theme_partial_content` longtext NOT NULL,
   `theme_partial_active` int(11) NOT NULL DEFAULT '1',
   `theme_partial_last_edit_time` bigint(20) NOT NULL,
   `theme_partial_theme_id` bigint(20) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS `theme_styles` (
   `theme_css_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `theme_css_name` varchar(100) NOT NULL,
   `theme_css_slug` varchar(100) NOT NULL,
-  `theme_css_content` text NOT NULL,
+  `theme_css_content` longtext NOT NULL,
   `theme_css_theme_id` bigint(20) NOT NULL,
   PRIMARY KEY (`theme_css_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
