@@ -31,6 +31,11 @@ define('EXTPATH', realpath(__DIR__.'/../fuel/extensions/').DIRECTORY_SEPARATOR);
 define('THEMEPATH', realpath(__DIR__.'/../fuel/themes/').DIRECTORY_SEPARATOR);
 
 /**
+ * Path to the uploads directory.
+ */
+define('UPLOADPATH', realpath(__DIR__.'/uploads/').DIRECTORY_SEPARATOR);
+
+/**
  * The path to the framework core.
  */
 define('COREPATH', realpath(__DIR__.'/../fuel/core/').DIRECTORY_SEPARATOR);
