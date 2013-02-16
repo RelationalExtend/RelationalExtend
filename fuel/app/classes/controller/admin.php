@@ -57,7 +57,6 @@ class Controller_Admin extends Controller_Template {
 
     protected function validate_authentication()
     {
-
         // Within any of the public URLs?
 
         $uri_string = explode('/', Uri::string());
@@ -378,7 +377,9 @@ class Controller_Admin extends Controller_Template {
             throw new HttpNotFoundException();
 
         parent::before();
-
+        
+  
+        
         CMSInit::init_componenets();
 
         if(method_exists($this, self::FUNC_ADMIN_SETTINGS))
@@ -390,9 +391,13 @@ class Controller_Admin extends Controller_Template {
         if(method_exists($this, self::FUNC_ADMIN_USERS))
             $this->admin_users_function = true;
 
+
+        
         // Activate authentication if authentication system works
         if($this->admin_users_function)
             $this->validate_authentication();
+        
+                    
     }
 
     /**
@@ -487,6 +492,9 @@ class Controller_Admin extends Controller_Template {
     public function action_index()
     {
         // TODO: Dashboard
+        
+        
+        
         $this->build_admin_interface(
             View::forge("admin/partials/default-dashboard")
         );
@@ -969,4 +977,8 @@ class Controller_Admin extends Controller_Template {
             throw new HttpNotFoundException();
         }
     }
+    
+    
+    
+   
 }
