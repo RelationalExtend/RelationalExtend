@@ -1,5 +1,5 @@
 <div style="padding: 50px; text-align: center; background-color: #dcdcdc;">
-    <form class="form-inline" method="post" action="<?php echo(Uri::base()."admin/login"); ?>">
+    <form class="form-inline" method="post" action="<?php echo(Uri::base()."cms/cms/login"); ?>">
         <input type="text" class="input-small" placeholder="Email / Username" name="username">
         <input type="password" class="input-small" placeholder="Password" name="password">
 

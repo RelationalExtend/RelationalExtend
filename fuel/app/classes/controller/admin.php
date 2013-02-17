@@ -18,7 +18,8 @@ class Controller_Admin extends Controller_Template {
     const MENU_EXTENSIONS = "extensions";
     const MENU_SETTINGS = "settings";
     const MENU_USERS = "users";
-
+    const MENU_LOGOUT = "logout";
+    
     const PAGINATION_ENABLED = "pagination_enabled";
     const PAGINATION_NUM_PAGES = "num_pages";
     const PAGINATION_CURRENT_PAGE = "current_page";
@@ -44,6 +45,8 @@ class Controller_Admin extends Controller_Template {
     protected $controller_path = "admin/";
     protected $action_path = null;
     protected $default_admin_extension_path = "admin/";
+    
+     protected $logout_path = "cms/cms/logout";
 
     // Admin layout
 
@@ -146,7 +149,8 @@ class Controller_Admin extends Controller_Template {
             self::MENU_CONTENT => $this->build_active_extensions_menu(),
             self::MENU_THEMES => $this->build_menu_item("Themes", $this->default_admin_extension_path.self::MENU_THEMES),
             self::MENU_EXTENSIONS => $this->build_menu_item("Extensions", $this->default_admin_extension_path.self::MENU_EXTENSIONS),
-        );
+         
+      );
 
          if($this->admin_settings_function)
             $links[self::MENU_SETTINGS] = $this->build_menu_item("Settings", $this->default_admin_extension_path.self::MENU_SETTINGS);
@@ -154,9 +158,13 @@ class Controller_Admin extends Controller_Template {
         if($this->admin_navigation_function)
             $links[self::MENU_NAVIGATION] = $this->build_menu_item("Navigation", $this->default_admin_extension_path.self::MENU_NAVIGATION);
 
-         if($this->admin_users_function)
+         if($this->admin_users_function){
             $links[self::MENU_USERS] = $this->build_menu_item("Users", $this->default_admin_extension_path.self::MENU_USERS);
-
+            if(Auth::check()){
+            $links[self::MENU_LOGOUT] = $this->build_menu_item("Logout", $this->logout_path);
+            }
+            
+         }
         return $links;
     }
 
@@ -411,11 +419,14 @@ class Controller_Admin extends Controller_Template {
         $user_name = Input::post("username", null);
         $password = Input::post("password", null);
 
+       
         if($user_name != null && $password != null)
         {
+           
+            
             $auth = Auth::instance();
             if($auth->login($user_name, $password))
-                Response::redirect(Uri.base()."admin/index");
+                Response::redirect(Uri::base()."cms/index");
         }
 
         $this->build_admin_interface(
@@ -433,7 +444,7 @@ class Controller_Admin extends Controller_Template {
     {
         Auth::logout();
 
-        Response::redirect(Uri::base()."admin/login");
+        Response::redirect(Uri::base()."cms/cms/login");
     }
     
     /**
@@ -980,5 +991,87 @@ class Controller_Admin extends Controller_Template {
     
     
     
+    
+    public function admin_users()
+    {
+        
+       
+        $users = $this->get_all_users();
+
+        // Autoload not installed themes for their meta data
+
+
+        $this->build_admin_interface(
+            View::forge("admin/partials/users", array("page_title" => "Users",
+                "page_title_content" => "Manage the site's Users",
+                "users" => $users))
+        );
+    }
+    
+    private function get_user_details($user_id)
+    {
+        $user = DB::select("*")->from("users")->where("id", "=", $user_id);
+        $user = $user->execute()->as_array();
+
+        if(count($user) > 0) {
+            return $user[0];
+        }
+
+        return null;
+    }
+    
+    public function get_all_users()
+    {
+        $user = DB::select("*")->from("users")->order_by("username");
+        $user = $user->execute()->as_array();
+
+        if(count($user) > 0) {
+            return $user;
+        }
+
+        return null;   
+    }
+    
+    public function check_auth_status($login_url = "admin/login", $redirect = false)
+    {
+        
+        $this->public_urls = array(
+            "login",
+            "signup"
+        );
+
+        $uri_string = explode('/', Uri::string());
+        
+        $num_params = count($uri_string);
+
+        if ($uri_string[$num_params - 2] == 'admin' and 
+                ($uri_string[$num_params -1] == 'login' or $uri_string[$num_params -1] == 'signup' or
+                 $uri_string[$num_params -1] == 'dologin'))
+        {   
+            return false;
+        }
+        else
+        {
+            if(Auth::check())
+            {
+                $user = Auth::instance()->get_user_id();
+                $this->user_id = $user[1];
+                $this->user_details = $this->get_user_details($this->user_id);
+
+                return true;
+            }
+            else
+            {   
+                if($redirect) {
+                    Response::redirect(Uri::base().$login_url);
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    }
+    
+
    
 }
