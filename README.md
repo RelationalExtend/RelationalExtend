@@ -24,3 +24,4 @@ RelationalExtend is an extendable framework built on [FuelPHP](http://fuelphp.co
 ##Contributors
 
 * Ahmed Maawy [@ahmedmaawy](https://twitter.com/ahmedmaawy) [http://ahmedmaawy.com](http://ahmedmaawy.com/).
+* Mostafa Elaghil [@melagil](https://twitter.com/melaghil)

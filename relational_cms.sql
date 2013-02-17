@@ -188,10 +188,7 @@ CREATE TABLE IF NOT EXISTS `theme_styles` (
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
-
-
 ------------------------------------------------------------------------------
-
 --
 -- Table structure for table `users`
 --
@@ -208,4 +205,4 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`,`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;

@@ -3,7 +3,7 @@
 /**
  * Main Admin Controller. We will be extending this in the sub classes
  *
- * @author     Ahmed Maawy
+ * @author     Ahmed Maawy and Mostafa Elaghil
  * @copyright  2011 - 2012 Ahmed Maawy
  */
 
@@ -376,6 +376,91 @@ class Controller_Admin extends Controller_Template {
     }
 
     /**
+     * Get user details
+     *
+     * @param $user_id
+     * @return null
+     */
+
+    private function get_user_details($user_id)
+    {
+        $user = DB::select("*")->from("users")->where("id", "=", $user_id);
+        $user = $user->execute()->as_array();
+
+        if(count($user) > 0) {
+            return $user[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all users
+     *
+     * @return null
+     */
+
+    public function get_all_users()
+    {
+        $user = DB::select("*")->from("users")->order_by("username");
+        $user = $user->execute()->as_array();
+
+        if(count($user) > 0) {
+            return $user;
+        }
+
+        return null;
+    }
+
+    /**
+     * Check on authentication status
+     *
+     * @param string $login_url
+     * @param bool $redirect
+     * @return bool
+     */
+
+    public function check_auth_status($login_url = "admin/login", $redirect = false)
+    {
+
+        $this->public_urls = array(
+            "login",
+            "signup"
+        );
+
+        $uri_string = explode('/', Uri::string());
+
+        $num_params = count($uri_string);
+
+        if ($uri_string[$num_params - 2] == 'admin' and
+                ($uri_string[$num_params -1] == 'login' or $uri_string[$num_params -1] == 'signup' or
+                 $uri_string[$num_params -1] == 'dologin'))
+        {
+            return false;
+        }
+        else
+        {
+            if(Auth::check())
+            {
+                $user = Auth::instance()->get_user_id();
+                $this->user_id = $user[1];
+                $this->user_details = $this->get_user_details($this->user_id);
+
+                return true;
+            }
+            else
+            {
+                if($redirect) {
+                    Response::redirect(Uri::base().$login_url);
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    }
+
+    /**
      * The first function to be executed before the controller is executed fully
      */
 
@@ -385,8 +470,6 @@ class Controller_Admin extends Controller_Template {
             throw new HttpNotFoundException();
 
         parent::before();
-        
-  
         
         CMSInit::init_componenets();
 
@@ -399,13 +482,10 @@ class Controller_Admin extends Controller_Template {
         if(method_exists($this, self::FUNC_ADMIN_USERS))
             $this->admin_users_function = true;
 
-
-        
         // Activate authentication if authentication system works
+
         if($this->admin_users_function)
             $this->validate_authentication();
-        
-                    
     }
 
     /**
@@ -418,19 +498,16 @@ class Controller_Admin extends Controller_Template {
     {
         $user_name = Input::post("username", null);
         $password = Input::post("password", null);
-
        
         if($user_name != null && $password != null)
-        {
-           
-            
+        {   
             $auth = Auth::instance();
             if($auth->login($user_name, $password))
-                Response::redirect(Uri::base()."cms/index");
+                Response::redirect(Uri::base().$this->controller_path."index");
         }
 
         $this->build_admin_interface(
-            View::forge("admin/partials/login")
+            View::forge("admin/partials/login", array('form_action' => Uri::base().$this->controller_path))
         );
     }
 
@@ -444,7 +521,7 @@ class Controller_Admin extends Controller_Template {
     {
         Auth::logout();
 
-        Response::redirect(Uri::base()."cms/cms/login");
+        Response::redirect(Uri::base().$this->controller_path."login");
     }
     
     /**
@@ -466,10 +543,10 @@ class Controller_Admin extends Controller_Template {
             $result = Auth::instance()->create_user($user_name, $password, $email_address, $group);
 
             if($result == false) {
-                Response::redirect(Uri::base()."admin/createuser/nosuccess");
+                Response::redirect(Uri::base().$this->controller_path."createuser/nosuccess");
             }
             else {
-                Response::redirect(Uri::base()."admin/users/successfulcreate");
+                Response::redirect(Uri::base().$this->controller_path."users/successfulcreate");
             }
         }
     }
@@ -503,8 +580,6 @@ class Controller_Admin extends Controller_Template {
     public function action_index()
     {
         // TODO: Dashboard
-        
-        
         
         $this->build_admin_interface(
             View::forge("admin/partials/default-dashboard")
@@ -988,90 +1063,4 @@ class Controller_Admin extends Controller_Template {
             throw new HttpNotFoundException();
         }
     }
-    
-    
-    
-    
-    public function admin_users()
-    {
-        
-       
-        $users = $this->get_all_users();
-
-        // Autoload not installed themes for their meta data
-
-
-        $this->build_admin_interface(
-            View::forge("admin/partials/users", array("page_title" => "Users",
-                "page_title_content" => "Manage the site's Users",
-                "users" => $users))
-        );
-    }
-    
-    private function get_user_details($user_id)
-    {
-        $user = DB::select("*")->from("users")->where("id", "=", $user_id);
-        $user = $user->execute()->as_array();
-
-        if(count($user) > 0) {
-            return $user[0];
-        }
-
-        return null;
-    }
-    
-    public function get_all_users()
-    {
-        $user = DB::select("*")->from("users")->order_by("username");
-        $user = $user->execute()->as_array();
-
-        if(count($user) > 0) {
-            return $user;
-        }
-
-        return null;   
-    }
-    
-    public function check_auth_status($login_url = "admin/login", $redirect = false)
-    {
-        
-        $this->public_urls = array(
-            "login",
-            "signup"
-        );
-
-        $uri_string = explode('/', Uri::string());
-        
-        $num_params = count($uri_string);
-
-        if ($uri_string[$num_params - 2] == 'admin' and 
-                ($uri_string[$num_params -1] == 'login' or $uri_string[$num_params -1] == 'signup' or
-                 $uri_string[$num_params -1] == 'dologin'))
-        {   
-            return false;
-        }
-        else
-        {
-            if(Auth::check())
-            {
-                $user = Auth::instance()->get_user_id();
-                $this->user_id = $user[1];
-                $this->user_details = $this->get_user_details($this->user_id);
-
-                return true;
-            }
-            else
-            {   
-                if($redirect) {
-                    Response::redirect(Uri::base().$login_url);
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-    }
-    
-
-   
 }
