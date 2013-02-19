@@ -327,7 +327,17 @@ class Controller_Admin extends Controller_Template {
 
         if($paged)
         {
-            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name)->as_object()->execute();
+            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name);
+
+            if($object_name != null && $object_name != "")
+                $num_pages_query = $num_pages_query>where("object_slug", "=", $object_name);
+
+            if($object_id != 0)
+                $num_pages_query = $num_pages_query->where("object_id", "=", $object_id);
+
+            $num_pages_query = $num_pages_query->as_object()->execute();
+
+
             $num_pages = ceil(($num_pages_query[0]->num_rows) / $page_size);
 
             $records->limit($page_size);
@@ -721,6 +731,7 @@ class Controller_Admin extends Controller_Template {
     /**
      * Default update action
      *
+     * @param null $media_upload_path
      * @return void
      */
 
