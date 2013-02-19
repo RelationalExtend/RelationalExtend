@@ -7,7 +7,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width:70%;">Theme</th>
+                <th style="width:70%;">Extension</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>

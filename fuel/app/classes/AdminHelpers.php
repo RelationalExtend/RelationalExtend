@@ -63,7 +63,7 @@ class AdminHelpers {
 
         foreach($buttons as $button)
         {
-            $button_html.="<a href='".$button->button_link."' class='btn'>".$button->button_text."</a>";
+            $button_html.="<a href='".$button->button_link."' class='btn' style='margin-right:5px;'>".$button->button_text."</a>";
         }
 
         return $button_html;

@@ -29,6 +29,7 @@ class Controller_Admin extends Controller_Template {
     const FUNC_ADMIN_SETTINGS = "admin_settings";
     const FUNC_ADMIN_NAVIGATION = "admin_navigation";
     const FUNC_ADMIN_USERS = "admin_users";
+    const MEDIA_UPLOAD_PATH = "media/";
 
     // Protected variables
 
@@ -45,8 +46,7 @@ class Controller_Admin extends Controller_Template {
     protected $controller_path = "admin/";
     protected $action_path = null;
     protected $default_admin_extension_path = "admin/";
-    
-     protected $logout_path = "cms/cms/logout";
+    protected $logout_path = "cms/cms/logout";
 
     // Admin layout
 
@@ -195,7 +195,7 @@ class Controller_Admin extends Controller_Template {
     }
 
     /**
-     * The UI tabs here. Feeds them to the tabular layout template section
+     * Feeds items to a tabular layout template
      *
      * @param $page_title
      * @param $page_content
@@ -270,6 +270,103 @@ class Controller_Admin extends Controller_Template {
              "page_title" => $page_title, "page_title_content" => $page_content,
              "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
              "return_path" => $return_path));
+
+        return $view;
+    }
+
+    /**
+     * Feeds items to a thumbnail view (must be images)
+     *
+     * @param $page_title
+     * @param $page_content
+     * @param $table_name
+     * @param $id_field
+     * @param $thumbnail_field
+     * @param null $object_name
+     * @param int $object_id
+     * @param string $return_path
+     * @param bool $paged
+     * @param int $page_number
+     * @param int $page_size
+     * @param null $action_name
+     * @param null $order_by
+     * @param string $direction
+     * @return view content
+     */
+
+    protected function build_admin_ui_thumbnail_list($page_title, $page_content, $table_name, $id_field, $thumbnail_field,
+        $object_name = null, $object_id = 0, $return_path = "", $paged = false, $page_number = 1, $page_size = 20,
+        $action_name = null, $order_by = null, $direction = 'asc')
+    {
+        // Tabular layout data here
+
+        $records = DB::select(array($id_field, 'id_field'), array($thumbnail_field, 'thumbnail_field'))
+            ->from($table_name);
+
+        if($object_name != null && $object_name != "")
+            $records = $records->where("object_slug", "=", $object_name);
+
+        if($object_id != 0)
+            $records = $records->where("object_id", "=", $object_id);
+
+        if($order_by != null)
+            $records->order_by($order_by, $direction);
+
+        $pagination_records = new stdClass();
+        $pagination_records->{self::PAGINATION_ENABLED} = $paged;
+        $pagination_records->{self::PAGINATION_CURRENT_PAGE} = $page_number;
+
+        if($action_name != null)
+            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."$action_name/";
+        else
+            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."index/";
+
+        $pagination_records->{self::PAGINATION_SIZE} = $page_size;
+
+        // Paged result
+
+        if($paged)
+        {
+            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name)->as_object()->execute();
+            $num_pages = ceil(($num_pages_query[0]->num_rows) / $page_size);
+
+            $records->limit($page_size);
+            $records->offset(($page_size * $page_number) - $page_size);
+
+            $pagination_records->{self::PAGINATION_NUM_PAGES} = $num_pages;
+        }
+
+        $record_array = $records->as_object()->execute();
+
+        // Embed button info
+
+        foreach($record_array as $key => $record_array_item)
+        {
+            $btn_edit = (trim($return_path) == "") ?
+                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field, "Edit") :
+                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field."/$return_path", "Edit");
+            $btn_delete = $this->build_bootstrap_button("delete/$table_name/".$record_array_item->id_field, "Delete");
+
+            $record_array[$key]->buttons = array($btn_edit, $btn_delete);
+        }
+
+        $bottom_buttons = array(
+            "btn_add" => (trim($return_path) == "") ?
+                    $this->build_bootstrap_button("edit/$table_name/0", "Add new") :
+                    $this->build_bootstrap_button("edit/$table_name/0/$return_path", "Add new")
+        );
+
+        $media_path = rtrim(Uri::base(), "/")."/".rtrim(basename(UPLOADPATH), "/")."/".self::MEDIA_UPLOAD_PATH;
+
+        if($object_name != null && $object_name != "")
+        {
+            $media_path.=$object_name."/";
+        }
+
+        $view = View::forge("admin/partials/thumbnail-view", array("table_rows" => $record_array,
+             "page_title" => $page_title, "page_title_content" => $page_content,
+             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
+             "return_path" => $return_path, "media_path" => $media_path));
 
         return $view;
     }
@@ -627,7 +724,7 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_update()
+    public function action_update($media_upload_path = null)
     {
         $record_id = Input::post("record_id");
         $object = Input::post("object");
@@ -688,8 +785,17 @@ class Controller_Admin extends Controller_Template {
                     }
                     break;
                 case DBFieldMeta::CONTROL_FILE:
-                    $value_to_set = ($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK) ?
+
+                    $upload_error = $_FILES[$object_meta_data_item->object_meta_slug]["error"];
+
+                    $value_to_set = ($upload_error == UPLOAD_ERR_OK) ?
                             $_FILES[$object_meta_data_item->object_meta_slug]["name"] : "";
+
+                    if($upload_error != UPLOAD_ERR_OK)
+                    {
+                        $skip_control = true;
+                    }
+
                     break;
             }
 
@@ -702,26 +808,32 @@ class Controller_Admin extends Controller_Template {
         $insert_id = 0;
         $rows_affected = 0;
 
-        if($record_id > 0)
+        if(count($database_array) > 0)
         {
-            $rows_affected = $update_object->set($database_array)->execute();
-            $insert_id = $record_id;
-        }
-        else {
-            list($insert_id, $rows_affected) = $update_object->set($database_array)->execute();
-        }
-
-        // Process and upload files afresh with their new destination names
-
-        foreach($object_meta_data as $object_meta_data_item)
-        {
-            if($object_meta_data_item->{Extension_ObjectMeta::SEGMENT_OBJECT_META_CONTROL} == DBFieldMeta::CONTROL_FILE)
+            if($record_id > 0)
             {
-                if($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK)
+                $rows_affected = $update_object->set($database_array)->execute();
+                $insert_id = $record_id;
+            }
+            else {
+                list($insert_id, $rows_affected) = $update_object->set($database_array)->execute();
+            }
+
+            // Process and upload files afresh with their new destination names
+
+            $media_destination_path = $media_upload_path == null ?
+                    UPLOADPATH : UPLOADPATH.rtrim($media_upload_path, "/")."/";
+
+            foreach($object_meta_data as $object_meta_data_item)
+            {
+                if($object_meta_data_item->{Extension_ObjectMeta::SEGMENT_OBJECT_META_CONTROL} == DBFieldMeta::CONTROL_FILE)
                 {
-                    $uploaded_file = $_FILES[$object_meta_data_item->object_meta_slug]["tmp_name"];
-                    $file_name = $_FILES[$object_meta_data_item->object_meta_slug]["name"];
-                    move_uploaded_file($uploaded_file, UPLOADPATH.$insert_id."_".$file_name);
+                    if($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK)
+                    {
+                        $uploaded_file = $_FILES[$object_meta_data_item->object_meta_slug]["tmp_name"];
+                        $file_name = $_FILES[$object_meta_data_item->object_meta_slug]["name"];
+                        move_uploaded_file($uploaded_file, $media_destination_path.$insert_id."_".$file_name);
+                    }
                 }
             }
         }

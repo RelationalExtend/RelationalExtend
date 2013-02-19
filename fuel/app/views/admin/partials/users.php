@@ -7,7 +7,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width:70%;">Theme</th>
+                <th style="width:70%;">User</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -15,7 +15,7 @@
 <?php foreach($users as $user) { ?>
             <tr>
                 <td><?php echo($user['username']); ?></td>
-                
+                <td>&nbsp;</td>
             </tr>
 <?php } ?>
         </tbody>
