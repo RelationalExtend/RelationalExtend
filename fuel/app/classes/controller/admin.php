@@ -222,29 +222,8 @@ class Controller_Admin extends Controller_Template {
         if($order_by != null)
             $records->order_by($order_by, $direction);
 
-        $pagination_records = new stdClass();
-        $pagination_records->{self::PAGINATION_ENABLED} = $paged;
-        $pagination_records->{self::PAGINATION_CURRENT_PAGE} = $page_number;
-
-        if($action_name != null)
-            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."$action_name/";
-        else
-            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."index/";
-        
-        $pagination_records->{self::PAGINATION_SIZE} = $page_size;
-
-        // Paged result
-
-        if($paged)
-        {
-            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name)->as_object()->execute();
-            $num_pages = ceil(($num_pages_query[0]->num_rows) / $page_size);
-
-            $records->limit($page_size);
-            $records->offset(($page_size * $page_number) - $page_size);
-
-            $pagination_records->{self::PAGINATION_NUM_PAGES} = $num_pages;
-        }
+        $pagination_records = CMSUtil::create_pagination_records($table_name, $records, $paged, $page_number,
+            $this->controller_path, $action_name, $page_size);
 
         $record_array = $records->as_object()->execute();
 
@@ -282,8 +261,7 @@ class Controller_Admin extends Controller_Template {
      * @param $table_name
      * @param $id_field
      * @param $thumbnail_field
-     * @param null $object_name
-     * @param int $object_id
+     * @param $description_field
      * @param string $return_path
      * @param bool $paged
      * @param int $page_number
@@ -305,33 +283,8 @@ class Controller_Admin extends Controller_Template {
         if($order_by != null)
             $records->order_by($order_by, $direction);
 
-        $pagination_records = new stdClass();
-        $pagination_records->{self::PAGINATION_ENABLED} = $paged;
-        $pagination_records->{self::PAGINATION_CURRENT_PAGE} = $page_number;
-
-        if($action_name != null)
-            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."$action_name/";
-        else
-            $pagination_records->{self::PAGINATION_LINK} = Uri::base().$this->controller_path."index/";
-
-        $pagination_records->{self::PAGINATION_SIZE} = $page_size;
-
-        // Paged result
-
-        if($paged)
-        {
-            $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name);
-
-            $num_pages_query = $num_pages_query->as_object()->execute();
-
-
-            $num_pages = ceil(($num_pages_query[0]->num_rows) / $page_size);
-
-            $records->limit($page_size);
-            $records->offset(($page_size * $page_number) - $page_size);
-
-            $pagination_records->{self::PAGINATION_NUM_PAGES} = $num_pages;
-        }
+        $pagination_records = CMSUtil::create_pagination_records($table_name, $records, $paged, $page_number,
+            $this->controller_path, $action_name, $page_size);
 
         $record_array = $records->as_object()->execute();
 
