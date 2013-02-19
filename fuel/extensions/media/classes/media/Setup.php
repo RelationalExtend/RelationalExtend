@@ -28,8 +28,7 @@ class Media_Setup extends \ExtensionSetup implements \ISetup {
 
         $meta_data[self::META_FIELDS] = array(
             new \DBFieldMeta("Media item", "media_item", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_FILE, ""),
-            new \DBFieldMeta("Object Slug", "object_slug", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_HIDDEN, ""),
-            new \DBFieldMeta("Object ID", "object_id", \DBFieldMeta::FIELD_BIGINT, 0, \DBFieldMeta::CONTROL_HIDDEN, ""),
+            new \DBFieldMeta("Media description", "media_description", \DBFieldMeta::FIELD_TEXT, 200, \DBFieldMeta::CONTROL_MULTI_TEXT, ""),
             new \DBFieldMeta("Media creation time", "media_creation_time", \DBFieldMeta::FIELD_TIMESTAMP, 0, \DBFieldMeta::CONTROL_HIDDEN, ""),
         );
 

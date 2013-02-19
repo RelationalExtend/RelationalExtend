@@ -162,7 +162,7 @@ class AdminHelpers {
                 }
                 break;
             case DBFieldMeta::CONTROL_MULTI_TEXT:
-                $return_string = "<textarea name='$control_name' rows='10' cols='160'>$values</textarea>";
+                $return_string = "<textarea name='$control_name' rows='10' cols='160' style='width:100%;'>$values</textarea>";
                 break;
             case DBFieldMeta::CONTROL_RICH_EDIT:
                 $return_string = "<textarea class='ckeditor' cols='80' name='$control_name' rows='10'>$values</textarea>";

@@ -11,22 +11,16 @@ namespace media;
 class Controller_Admin extends \cms\Controller_CMS {
     protected $controller_path = "media/admin/";
 
-    private $object_slug = null;
-    private $object_id = 0;
-
     public function before()
     {
         parent::before();
     }
 
-    public function action_index($page_number = 1, $object_slug = null, $object_id = 0)
+    public function action_index($page_number = 1)
     {
-        $this->object_slug = $object_slug;
-        $this->object_id = $object_id;
-
         $this->build_admin_interface(
             $this->build_admin_ui_thumbnail_list("Media items", "View and manage media items", Media_Setup::TABLE_MEDIA,
-                "id", "media_item", $object_slug, $object_id, "", true, $page_number, 20)
+                "id", "media_item", "media_description", "", true, $page_number, 20)
         );
     }
 
@@ -40,14 +34,6 @@ class Controller_Admin extends \cms\Controller_CMS {
         $value = null;
 
         switch($field_name) {
-            case "object_slug":
-                $value = $this->object_slug;
-                break;
-
-            case "object_id":
-                $value = $this->object_id;
-                break;
-
             case "media_creation_time":
                 $value = false;
                 break;

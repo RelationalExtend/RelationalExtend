@@ -294,20 +294,13 @@ class Controller_Admin extends Controller_Template {
      * @return view content
      */
 
-    protected function build_admin_ui_thumbnail_list($page_title, $page_content, $table_name, $id_field, $thumbnail_field,
-        $object_name = null, $object_id = 0, $return_path = "", $paged = false, $page_number = 1, $page_size = 20,
-        $action_name = null, $order_by = null, $direction = 'asc')
+    protected function build_admin_ui_thumbnail_list($page_title, $page_content, $table_name, $id_field, $thumbnail_field, $description_field,
+        $return_path = "", $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
     {
         // Tabular layout data here
 
-        $records = DB::select(array($id_field, 'id_field'), array($thumbnail_field, 'thumbnail_field'))
-            ->from($table_name);
-
-        if($object_name != null && $object_name != "")
-            $records = $records->where("object_slug", "=", $object_name);
-
-        if($object_id != 0)
-            $records = $records->where("object_id", "=", $object_id);
+        $records = DB::select(array($id_field, 'id_field'), array($thumbnail_field, 'thumbnail_field'),
+            array($description_field, 'description_field'))->from($table_name);
 
         if($order_by != null)
             $records->order_by($order_by, $direction);
@@ -328,12 +321,6 @@ class Controller_Admin extends Controller_Template {
         if($paged)
         {
             $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table_name);
-
-            if($object_name != null && $object_name != "")
-                $num_pages_query = $num_pages_query>where("object_slug", "=", $object_name);
-
-            if($object_id != 0)
-                $num_pages_query = $num_pages_query->where("object_id", "=", $object_id);
 
             $num_pages_query = $num_pages_query->as_object()->execute();
 
@@ -366,13 +353,8 @@ class Controller_Admin extends Controller_Template {
                     $this->build_bootstrap_button("edit/$table_name/0/$return_path", "Add new")
         );
 
-        $media_path = rtrim(Uri::base(), "/")."/".rtrim(basename(UPLOADPATH), "/")."/".self::MEDIA_UPLOAD_PATH;
-
-        if($object_name != null && $object_name != "")
-        {
-            $media_path.=$object_name."/";
-        }
-
+        $media_path = Uri::base().basename(UPLOADPATH)."/media/";
+        
         $view = View::forge("admin/partials/thumbnail-view", array("table_rows" => $record_array,
              "page_title" => $page_title, "page_title_content" => $page_content,
              "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
