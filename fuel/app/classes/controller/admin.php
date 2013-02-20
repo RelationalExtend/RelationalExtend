@@ -87,7 +87,7 @@ class Controller_Admin extends Controller_Template {
         else
         {
             $this->template->logged_in = false;
-            Response::redirect(Uri::base().$this->controller_path."login");
+            Response::redirect(Uri::base()."cms/cms/login");
 
             $this->logged_in = false;
 
