@@ -21,6 +21,8 @@ class Controller_Admin extends \cms\Controller_CMS {
         $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Media_Setup::TABLE_MEDIA,
                 "id", "media_description", "media_item");
         $table_view_descriptor->page_number = $page_number;
+        $table_view_descriptor->page_title = "Media";
+        $table_view_descriptor->page_content = "Manage site media";
 
         $this->build_admin_interface(
             $this->build_admin_ui_thumbnail_list($table_view_descriptor, "index")

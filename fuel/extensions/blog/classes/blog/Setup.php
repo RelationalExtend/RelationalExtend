@@ -25,9 +25,11 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
 
         // Main blog table
 
-        $meta_data[self::META_TABLE_NAME] = self::TABLE_BLOG;
+        $blog_meta_data = array();
 
-        $meta_data[self::META_FIELDS] = array(
+        $blog_meta_data[self::META_TABLE_NAME] = self::TABLE_BLOG;
+
+        $blog_meta_data[self::META_FIELDS] = array(
             new \DBFieldMeta("Blog title", "blog_title", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_SIMPLE_TEXT, ""),
             new \DBFieldMeta("Blog cover image", "blog_cover_image", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_FILE, ""),
             new \DBFieldMeta("Blog slug","blog_slug", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_HIDDEN, ""),
@@ -40,21 +42,25 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
             new \DBFieldMeta("Post active", "post_active", \DBFieldMeta::FIELD_INT, 0, \DBFieldMeta::CONTROL_CHECKBOX, ""),
         );
 
-        $meta_data[self::META_SETTINGS] = array(
+        $blog_meta_data[self::META_SETTINGS] = array(
             new \DBFieldMeta("Default number of posts to display per page", "posts_per_page", \DBFieldMeta::FIELD_INT, 0, \DBFieldMeta::CONTROL_SIMPLE_TEXT, "20"),
         );
 
-        $tables[] = $meta_data;
+        $tables[] = $blog_meta_data;
 
         // Categories table
 
-        $meta_data[self::META_TABLE_NAME] = self::TABLE_CATEGORIES;
+        $categories_meta_data = array();
 
-        $meta_data[self::META_FIELDS] = array(
+        $categories_meta_data[self::META_TABLE_NAME] = self::TABLE_CATEGORIES;
+
+        $categories_meta_data[self::META_FIELDS] = array(
             new \DBFieldMeta("Blog category", "blog_category", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_SIMPLE_TEXT, ""),
         );
 
-        $tables[] = $meta_data;
+        $categories_meta_data[self::META_SETTINGS] = array();
+
+        $tables[] = $categories_meta_data;
 
         // Build the setup
 

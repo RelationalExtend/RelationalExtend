@@ -29,6 +29,28 @@ class Controller_Admin extends \cms\Controller_CMS {
             "media_active" => $this->media_active,
         );
     }
+
+    private function tag_page_media($page_id, $media_id)
+    {
+        $num_rows_query = \Fuel\Core\DB::select(\Fuel\Core\DB::expr("COUNT(*) AS num_rows"))->from(Page_Setup::TABLE_MEDIA)
+            ->where("page_id", "=", $page_id)
+            ->and_where("media_id", "=", $media_id)
+            ->as_object()->execute();
+
+        if(intval($num_rows_query[0]->num_rows) < 1)
+        {
+            list($insert_id, $rows_affected) = \Fuel\Core\DB::insert(Page_Setup::TABLE_MEDIA)
+                ->set(array(
+                          "page_id" => $page_id,
+                          "media_id" => $media_id
+                      ))
+                ->execute();
+
+            return $insert_id;
+        }
+
+        return 0;
+    }
     
     public function before()
     {
@@ -51,9 +73,18 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(true, false));
 
+        // Build the tabular view
+
         $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Page_Setup::TABLE_PAGES,
             "id", "page_title", "");
         $table_view_descriptor->page_number = $page_number;
+        $table_view_descriptor->page_title = "Pages";
+        $table_view_descriptor->page_content = "Manage site pages";
+
+        if($this->media_active)
+            $table_view_descriptor->set_additional_buttonfields(array("Add media" => "media/{{ record_id }}/1"));
+
+        // Build the UI
 
         $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "index");
 
@@ -64,22 +95,28 @@ class Controller_Admin extends \cms\Controller_CMS {
         );
     }
 
-    public function action_media($page_number = 1)
+    public function action_media($record_id = 0, $page_number = 1)
     {
         if($this->media_active)
         {
             $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(false, true));
 
+            // Build the thumbnail view
+
             $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, self::MEDIA_EXTENSION,
                 "id", "media_description", "media_item");
 
             $table_view_descriptor->page_number = $page_number;
+            $table_view_descriptor->page_title = "Page media";
+            $table_view_descriptor->page_content = "Manage media linked to pages";
 
             $table_view_descriptor->add_button_visible = false;
             $table_view_descriptor->delete_button_visible = false;
             $table_view_descriptor->edit_button_visible = false;
             
-            $table_view_descriptor->set_additional_buttonfields(array("Select" => "addmedia/{{ table }}/{{ record_id }}"));
+            $table_view_descriptor->set_additional_buttonfields(array("Select" => "addmedia/$record_id/{{ record_id }}/$page_number"));
+
+            // Build the UI
 
             $list_interface = $this->build_admin_ui_thumbnail_list($table_view_descriptor, "media");
 
@@ -95,9 +132,19 @@ class Controller_Admin extends \cms\Controller_CMS {
         }
     }
 
-    public function action_addmedia($table, $record, $page_id = 0)
+    public function action_addmedia($record_id, $media_id, $page_number)
     {
         // Add media to this page or to all pages
+        if($this->media_active)
+        {
+            $this->tag_page_media($record_id, $media_id);
+
+            $this->action_media($record_id, $page_number);
+        }
+        else
+        {
+            throw new \Fuel\Core\HttpNotFoundException();
+        }
     }
 
     protected function special_field_operation($field_name, $value_sets)

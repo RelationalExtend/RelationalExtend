@@ -40,6 +40,8 @@ class Controller_Admin extends \cms\Controller_CMS {
         $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Blog_Setup::TABLE_BLOG,
                 "id", "blog_title", "");
         $table_view_descriptor->page_number = $page_number;
+        $table_view_descriptor->page_title = "Blog posts";
+        $table_view_descriptor->page_content = "Manage blog posts";
 
         $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "index");
 
@@ -56,6 +58,8 @@ class Controller_Admin extends \cms\Controller_CMS {
         $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Blog_Setup::TABLE_CATEGORIES,
                 "id", "blog_category", "");
         $table_view_descriptor->paged = false;
+        $table_view_descriptor->page_title = "Categories";
+        $table_view_descriptor->page_content = "Manage blog categories";
 
         $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "categories");
 

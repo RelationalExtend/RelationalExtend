@@ -7,7 +7,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width: 80%;">Rows</th>
+                <th style="width: 60%;">Rows</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>

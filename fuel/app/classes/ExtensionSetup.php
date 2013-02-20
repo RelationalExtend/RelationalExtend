@@ -115,6 +115,8 @@ class ExtensionSetup {
 
             $table_name = $object_meta_data[self::META_TABLE_NAME];
 
+            $table_fields = array();
+
             // Primary key field
             $table_fields['id'] = array(
                 'type' => 'bigint',
