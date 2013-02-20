@@ -252,6 +252,7 @@ class Controller_Admin extends Controller_Template {
      * @param string $return_path
      * @return view content
      */
+    
     protected function build_admin_ui_form_view($page_title, $page_content, $table_slug, $form_action,
         $record_id = 0, $return_path = "")
     {

@@ -18,6 +18,7 @@ class ObjectModel_TabularView {
     public $order_by = null;
     public $direction = 'asc';
     public $controller_path = "";
+    public $records_not_in = array();
 
     public $add_button_visible = true;
     public $edit_button_visible = true;
@@ -129,6 +130,18 @@ class ObjectModel_TabularView {
     public function execute()
     {
         if(!$this->executed) {
+            if(is_array($this->records_not_in))
+            {
+                if(count($this->records_not_in) > 0)
+                {
+                    foreach($this->records_not_in as $field => $record_not_in)
+                    {
+                        if(is_array($record_not_in))
+                            $this->records = $this->records->where($field, 'not in', $record_not_in);
+                    }
+                }
+            }
+
             $this->record_objects = $this->records->as_object()->execute();
             $this->executed = true;
 

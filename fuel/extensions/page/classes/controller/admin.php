@@ -101,6 +101,18 @@ class Controller_Admin extends \cms\Controller_CMS {
         {
             $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(false, true));
 
+            // Get already selected media items
+
+            $selected_items = array();
+
+            $selected_records = \Fuel\Core\DB::select("media_id")->from(Page_Setup::TABLE_MEDIA)
+                    ->where("page_id" ,"=" , $record_id)->as_object()->execute();
+
+            foreach($selected_records as $selected_record)
+            {
+                $selected_items[] = $selected_record->media_id;
+            }
+
             // Build the thumbnail view
 
             $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, self::MEDIA_EXTENSION,
@@ -113,6 +125,9 @@ class Controller_Admin extends \cms\Controller_CMS {
             $table_view_descriptor->add_button_visible = false;
             $table_view_descriptor->delete_button_visible = false;
             $table_view_descriptor->edit_button_visible = false;
+
+            if(count($selected_items) > 0)
+                $table_view_descriptor->records_not_in = array('id' => $selected_items);
             
             $table_view_descriptor->set_additional_buttonfields(array("Select" => "addmedia/$record_id/{{ record_id }}/$page_number"));
 
