@@ -37,8 +37,11 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(true, false));
 
-        $list_interface = $this->build_admin_ui_tabular_list("Blog Posts", "View and manage blog posts", Blog_Setup::TABLE_BLOG,
-                "id", "blog_title", "", true, $page_number, 20);
+        $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Blog_Setup::TABLE_BLOG,
+                "id", "blog_title", "");
+        $table_view_descriptor->page_number = $page_number;
+
+        $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "index");
 
         $main_interface = $nav_interface.$list_interface;
 
@@ -50,8 +53,11 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(false, true));
 
-        $list_interface = $this->build_admin_ui_tabular_list("Blog Categories", "View and manage blog categories", Blog_Setup::TABLE_CATEGORIES,
-                "id", "blog_category", "categories");
+        $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Blog_Setup::TABLE_CATEGORIES,
+                "id", "blog_category", "");
+        $table_view_descriptor->paged = false;
+
+        $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "categories");
 
         $main_interface = $nav_interface.$list_interface;
 

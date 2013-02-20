@@ -18,9 +18,12 @@ class Controller_Admin extends \cms\Controller_CMS {
 
     public function action_index($page_number = 1)
     {
+        $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Media_Setup::TABLE_MEDIA,
+                "id", "media_description", "media_item");
+        $table_view_descriptor->page_number = $page_number;
+
         $this->build_admin_interface(
-            $this->build_admin_ui_thumbnail_list("Media items", "View and manage media items", Media_Setup::TABLE_MEDIA,
-                "id", "media_item", "media_description", "", true, $page_number, 20)
+            $this->build_admin_ui_thumbnail_list($table_view_descriptor, "index")
         );
     }
 

@@ -197,58 +197,21 @@ class Controller_Admin extends Controller_Template {
     /**
      * Feeds items to a tabular layout template
      *
-     * @param $page_title
-     * @param $page_content
-     * @param $table_name
-     * @param $id_field
-     * @param $description_field
-     * @param string $return_path
-     * @param bool $paged
-     * @param int $page_number
-     * @param int $page_size
-     * @param null $action_name
-     * @param null $order_by
-     * @param string $direction
+     * @param $tabular_view_descriptor
+     * @param $action_name
      * @return view content
      */
-    protected function build_admin_ui_tabular_list($page_title, $page_content, $table_name, $id_field, $description_field,
-        $return_path = "", $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
+    protected function build_admin_ui_tabular_list($tabular_view_descriptor, $action_name)
     {
         // Tabular layout data here
 
-        $records = DB::select(array($id_field, 'id_field'), array($description_field, 'description_field'))
-            ->from($table_name);
-
-        if($order_by != null)
-            $records->order_by($order_by, $direction);
-
-        $pagination_records = CMSUtil::create_pagination_records($table_name, $records, $paged, $page_number,
-            $this->controller_path, $action_name, $page_size);
-
-        $record_array = $records->as_object()->execute();
-
-        // Embed button info
-
-        foreach($record_array as $key => $record_array_item)
-        {
-            $btn_edit = (trim($return_path) == "") ?
-                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field, "Edit") :
-                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field."/$return_path", "Edit");
-            $btn_delete = $this->build_bootstrap_button("delete/$table_name/".$record_array_item->id_field, "Delete");
-
-            $record_array[$key]->buttons = array($btn_edit, $btn_delete);
-        }
-
-        $bottom_buttons = array(
-            "btn_add" => (trim($return_path) == "") ?
-                    $this->build_bootstrap_button("edit/$table_name/0", "Add new") :
-                    $this->build_bootstrap_button("edit/$table_name/0/$return_path", "Add new")
-        );
+        $pagination_records = $tabular_view_descriptor->paged_results($action_name);
+        $record_array = $tabular_view_descriptor->execute();
 
         $view = View::forge("admin/partials/table-view", array("table_rows" => $record_array,
-             "page_title" => $page_title, "page_title_content" => $page_content,
-             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
-             "return_path" => $return_path));
+             "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
+             "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
+             "return_path" => $tabular_view_descriptor->return_path));
 
         return $view;
     }
@@ -256,62 +219,24 @@ class Controller_Admin extends Controller_Template {
     /**
      * Feeds items to a thumbnail view (must be images)
      *
-     * @param $page_title
-     * @param $page_content
-     * @param $table_name
-     * @param $id_field
-     * @param $thumbnail_field
-     * @param $description_field
-     * @param string $return_path
-     * @param bool $paged
-     * @param int $page_number
-     * @param int $page_size
-     * @param null $action_name
-     * @param null $order_by
-     * @param string $direction
+     * @param $tabular_view_descriptor
+     * @param $action_name
      * @return view content
      */
 
-    protected function build_admin_ui_thumbnail_list($page_title, $page_content, $table_name, $id_field, $thumbnail_field, $description_field,
-        $return_path = "", $paged = false, $page_number = 1, $page_size = 20, $action_name = null, $order_by = null, $direction = 'asc')
+    protected function build_admin_ui_thumbnail_list($tabular_view_descriptor, $action_name)
     {
         // Tabular layout data here
 
-        $records = DB::select(array($id_field, 'id_field'), array($thumbnail_field, 'thumbnail_field'),
-            array($description_field, 'description_field'))->from($table_name);
-
-        if($order_by != null)
-            $records->order_by($order_by, $direction);
-
-        $pagination_records = CMSUtil::create_pagination_records($table_name, $records, $paged, $page_number,
-            $this->controller_path, $action_name, $page_size);
-
-        $record_array = $records->as_object()->execute();
-
-        // Embed button info
-
-        foreach($record_array as $key => $record_array_item)
-        {
-            $btn_edit = (trim($return_path) == "") ?
-                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field, "Edit") :
-                    $this->build_bootstrap_button("edit/$table_name/".$record_array_item->id_field."/$return_path", "Edit");
-            $btn_delete = $this->build_bootstrap_button("delete/$table_name/".$record_array_item->id_field, "Delete");
-
-            $record_array[$key]->buttons = array($btn_edit, $btn_delete);
-        }
-
-        $bottom_buttons = array(
-            "btn_add" => (trim($return_path) == "") ?
-                    $this->build_bootstrap_button("edit/$table_name/0", "Add new") :
-                    $this->build_bootstrap_button("edit/$table_name/0/$return_path", "Add new")
-        );
+        $pagination_records = $tabular_view_descriptor->paged_results($action_name);
+        $record_array = $tabular_view_descriptor->execute();
 
         $media_path = Uri::base().basename(UPLOADPATH)."/media/";
         
         $view = View::forge("admin/partials/thumbnail-view", array("table_rows" => $record_array,
-             "page_title" => $page_title, "page_title_content" => $page_content,
-             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
-             "return_path" => $return_path, "media_path" => $media_path));
+             "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
+             "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
+             "return_path" => $tabular_view_descriptor->return_path, "media_path" => $media_path));
 
         return $view;
     }
@@ -395,12 +320,7 @@ class Controller_Admin extends Controller_Template {
 
     protected function build_bootstrap_button($url, $text)
     {
-        $my_button = new stdClass();
-
-        $my_button->button_link = Uri::base().$this->controller_path.$url;
-        $my_button->button_text = $text;
-
-        return $my_button;
+        return AdminHelpers::build_bootstrap_button($this->controller_path, $url, $text);
     }
 
     /**

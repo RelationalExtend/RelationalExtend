@@ -261,4 +261,23 @@ class AdminHelpers {
 
         return $pagination_string;
     }
+
+    /**
+     * Build a twitter bootstrap button
+     *
+     * @param $url
+     * @param $text
+     * @param $controller_path
+     * @return stdClass
+     */
+
+    public static function build_bootstrap_button($controller_path, $url, $text)
+    {
+        $my_button = new stdClass();
+
+        $my_button->button_link = Uri::base().$controller_path.$url;
+        $my_button->button_text = $text;
+
+        return $my_button;
+    }
 }

@@ -29,41 +29,7 @@ class Controller_Admin extends \cms\Controller_CMS {
             "media_active" => $this->media_active,
         );
     }
-
-    private function media_thumbnail_list($page_title, $page_content, $action_name, $paged = true, $page_number = 1)
-    {
-        // Tabular layout data here
-
-        $records = \Fuel\Core\DB::select(array('id', 'id_field'), array('media_item', 'thumbnail_field'),
-            array('media_description', 'description_field'))->from(self::MEDIA_EXTENSION);
-
-        $records->order_by('id', 'desc');
-
-        $pagination_records = \CMSUtil::create_pagination_records(self::MEDIA_EXTENSION, $records, $paged, $page_number,
-            $this->controller_path, $action_name, 20);
-
-        $record_array = $records->as_object()->execute();
-
-        // Embed button info
-
-        foreach($record_array as $key => $record_array_item)
-        {
-            $btn_select = $this->build_bootstrap_button("select/".$record_array_item->id_field, "Select");
-            $record_array[$key]->buttons = array($btn_select);
-        }
-
-        $bottom_buttons = array();
-
-        $media_path = \Fuel\Core\Uri::base().basename(UPLOADPATH)."/media/";
-
-        $view = \Fuel\Core\View::forge("admin/partials/thumbnail-view", array("table_rows" => $record_array,
-             "page_title" => $page_title, "page_title_content" => $page_content,
-             "bottom_buttons" => $bottom_buttons, "pagination_records" => $pagination_records,
-             "return_path" => "media/$page_number", "media_path" => $media_path));
-
-        return $view;
-    }
-
+    
     public function before()
     {
         parent::before();
@@ -85,8 +51,11 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(true, false));
 
-        $list_interface = $this->build_admin_ui_tabular_list("Pages", "View and manage pages", Page_Setup::TABLE_PAGES,
-                "id", "page_title", "", true, $page_number, 20);
+        $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, Page_Setup::TABLE_PAGES,
+            "id", "page_title", "");
+        $table_view_descriptor->page_number = $page_number;
+
+        $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "index");
 
         $main_interface = $nav_interface.$list_interface;
 
@@ -101,8 +70,18 @@ class Controller_Admin extends \cms\Controller_CMS {
         {
             $nav_interface = \Fuel\Core\View::forge("admin/tabs", $this->build_nav_menu_vars(false, true));
 
-            $list_interface = $this->media_thumbnail_list("Media", "Select media items to add", "media",
-                true, $page_number);
+            $table_view_descriptor = new \ObjectModel_TabularView($this->controller_path, self::MEDIA_EXTENSION,
+                "id", "media_description", "media_item");
+
+            $table_view_descriptor->page_number = $page_number;
+
+            $table_view_descriptor->add_button_visible = false;
+            $table_view_descriptor->delete_button_visible = false;
+            $table_view_descriptor->edit_button_visible = false;
+            
+            $table_view_descriptor->set_additional_buttonfields(array("Select" => "addmedia/{{ table }}/{{ record_id }}"));
+
+            $list_interface = $this->build_admin_ui_thumbnail_list($table_view_descriptor, "media");
 
             $main_interface = $nav_interface.$list_interface;
     
@@ -116,9 +95,9 @@ class Controller_Admin extends \cms\Controller_CMS {
         }
     }
 
-    public function action_selectmediaitem($media_item_id)
+    public function action_addmedia($table, $record, $page_id = 0)
     {
-        
+        // Add media to this page or to all pages
     }
 
     protected function special_field_operation($field_name, $value_sets)
