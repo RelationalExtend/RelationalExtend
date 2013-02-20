@@ -423,6 +423,30 @@ class Controller_Admin extends Controller_Template {
     }
 
     /**
+     * Gets extension installation status
+     *
+     * @param $extension
+     * @return bool
+     */
+
+    protected function is_extension_installed($extension)
+    {
+        return CMSInit::is_extension_installed($extension);
+    }
+
+    /**
+     * Gets theme installation status
+     *
+     * @param $theme
+     * @return bool
+     */
+
+    protected function is_theme_installed($theme)
+    {
+        return CMSInit::is_theme_installed($theme);
+    }
+
+    /**
      * The first function to be executed before the controller is executed fully
      */
 

@@ -56,7 +56,7 @@ class Controller_Admin extends \cms\Controller_CMS {
     {
         parent::before();
 
-        if(\CMSInit::is_extension_installed(self::MEDIA_EXTENSION))
+        if($this->is_extension_installed(self::MEDIA_EXTENSION))
         {
             $this->media_active = true;
         }
