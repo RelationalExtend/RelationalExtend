@@ -23,7 +23,7 @@
 ?>
 
             <?php echo(AdminHelpers::record_label($page_row)); ?>
-            <?php echo(AdminHelpers::record_control($page_row, $record)); ?>
+            <?php echo(AdminHelpers::record_control($page_row, $record, (isset($form_values[$page_row->object_meta_slug]) ? $form_values[$page_row->object_meta_slug] : null))); ?>
 <?php
         }
         else {

@@ -264,6 +264,8 @@ class Controller_Admin extends Controller_Template {
         if($record_id > 0)
             $record = DB::select("*")->from($table_slug)->where("id", "=", $record_id)->as_object()->execute();
 
+        $form_values = $this->preset_form_fields();
+
         if(count($record) > 0)
             $record = $record[0];
         else
@@ -272,7 +274,7 @@ class Controller_Admin extends Controller_Template {
         $view = View::forge("admin/partials/record-view", array("page_rows" => $object_meta_data,
                     "record_id" => $record_id, "page_title" => $page_title, "page_title_content" => $page_content,
                     "form_action" => Uri::base().$this->controller_path.$form_action, "object" => $table_slug,
-                    "record" => $record, "return_path" => $return_path));
+                    "record" => $record, "form_values" => $form_values, "return_path" => $return_path));
 
         return $view;
     }
@@ -336,6 +338,18 @@ class Controller_Admin extends Controller_Template {
     {
         // To be overriden
         return null;
+    }
+
+    /**
+     * Override this to set form field values
+     *
+     * @return array()
+     */
+
+    protected function preset_form_fields()
+    {
+        // To be overriden
+        return array();
     }
 
     /**

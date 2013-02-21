@@ -81,10 +81,11 @@ class AdminHelpers {
      * @static
      * @param $record
      * @param null $record_value
+     * @param null $preset_record_value
      * @return string
      */
 
-    public static function record_control($record, $record_value = null)
+    public static function record_control($record, $record_value = null, $preset_record_value = null)
     {
 
         // TODO: Implement functionality for all the control types
@@ -95,8 +96,15 @@ class AdminHelpers {
         $control_values = $values;
         $return_string = null;
 
+        // Any record values set?
+
         if($record_value != null)
             $values = $record_value->{$record->object_meta_slug};
+
+        // Any preset values?
+
+        if($preset_record_value != null)
+            $values = $preset_record_value;
         
         switch($record->object_meta_control)
         {
