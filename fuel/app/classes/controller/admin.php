@@ -177,21 +177,8 @@ class Controller_Admin extends Controller_Template {
 
     protected function get_object_meta_data($object_name)
     {
-        $objects_table = ExtensionSetup::EXTENSION_OBJECTS_TABLE;
-        $objects_meta_table = ExtensionSetup::EXTENSION_OBJECTS_META_TABLE;
-
-        $object = DB::select("object_id")->from($objects_table)
-                ->where("object_slug", "=", $object_name)->as_object()->execute();
-
-        if(count($object) < 1)
-            return null;
-
-        $object_id = $object[0]->object_id;
-
-        $object_meta_data = DB::select("*")->from($objects_meta_table)
-                ->where("object_id", "=", $object_id)->as_object()->execute();
-
-        return $object_meta_data;
+        $object_meta_data = new ObjectModel_ObjectMetaData($object_name);
+        return $object_meta_data->get_meta_data();
     }
 
     /**
@@ -258,23 +245,17 @@ class Controller_Admin extends Controller_Template {
     {
         // Record view data here
 
-        $object_meta_data = $this->get_object_meta_data($table_slug);
-        $record = array();
+        $form_view = new ObjectModel_FormView($table_slug, $record_id, $return_path);
+        $form_view->page_title = $page_title;
+        $form_view->page_content = $page_content;
+        $form_view->form_action = $form_action;
+        $form_view->preset_form_fields = $this->preset_form_fields();
 
-        if($record_id > 0)
-            $record = DB::select("*")->from($table_slug)->where("id", "=", $record_id)->as_object()->execute();
-
-        $form_values = $this->preset_form_fields();
-
-        if(count($record) > 0)
-            $record = $record[0];
-        else
-            $record = null;
-
-        $view = View::forge("admin/partials/record-view", array("page_rows" => $object_meta_data,
+        $view = View::forge("admin/partials/record-view", array("page_rows" => $form_view->get_object_meta_data(),
                     "record_id" => $record_id, "page_title" => $page_title, "page_title_content" => $page_content,
-                    "form_action" => Uri::base().$this->controller_path.$form_action, "object" => $table_slug,
-                    "record" => $record, "form_values" => $form_values, "return_path" => $return_path));
+                    "form_action" => Uri::base().$this->controller_path.$form_view->form_action, "object" => $table_slug,
+                    "record" => $form_view->get_records(), "form_values" => $form_view->preset_form_fields,
+                    "return_path" => $form_view->return_path));
 
         return $view;
     }
@@ -336,7 +317,7 @@ class Controller_Admin extends Controller_Template {
 
     protected function special_field_operation($field_name, $value_sets)
     {
-        // To be overriden
+        // To be overridden
         return null;
     }
 
@@ -348,7 +329,7 @@ class Controller_Admin extends Controller_Template {
 
     protected function preset_form_fields()
     {
-        // To be overriden
+        // To be overridden
         return array();
     }
 
