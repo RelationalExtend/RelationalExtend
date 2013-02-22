@@ -10,6 +10,8 @@
                 <div class="thumbnail">
                     <p><img src='<?php echo($media_path.$table_row->id_field.'_'.$table_row->thumbnail_field); ?>'/></p>
                     <p style="padding:10px;"><?php echo($table_row->description_field); ?></p>
+                    <p>Link:</p>
+                    <p><textarea rows="3" cols="" style='width:95%;' disabled="disabled"><?php echo($media_path.$table_row->id_field.'_'.$table_row->thumbnail_field); ?></textarea></p>
                     <p style="padding:10px;"><?php echo(AdminHelpers::bootstrap_buttons($table_row->buttons)); ?></p>
                 </div>
             </li>
