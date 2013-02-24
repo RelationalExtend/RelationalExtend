@@ -862,16 +862,20 @@ class CMSTheme {
 	
 	public static function get_theme_components($theme_id)
 	{
-		$layouts = DB::select(array("theme_layout_id", "theme_layout_id"), array("theme_layout_name", "theme_layout_name"))
+		$layouts = DB::select(array("theme_layout_id", "theme_layout_id"), array("theme_layout_name", "theme_layout_name"),
+			array("theme_layout_slug", "theme_layout_slug"))
 			->from(self::TABLE_THEME_LAYOUTS)
 			->where("theme_layout_theme_id", "=", $theme_id)->as_object()->execute();
-		$partials = DB::select(array("theme_partial_id", "theme_partial_id"), array("theme_partial_name", "theme_partial_name"))
+		$partials = DB::select(array("theme_partial_id", "theme_partial_id"), array("theme_partial_name", "theme_partial_name"),
+			array("theme_partial_slug", "theme_partial_slug"))
 			->from(self::TABLE_THEME_PARTIALS)
 			->where("theme_partial_theme_id", "=", $theme_id)->as_object()->execute();
-		$javascripts = DB::select(array("theme_js_id", "theme_js_id"), array("theme_js_name", "theme_js_name"))
+		$javascripts = DB::select(array("theme_js_id", "theme_js_id"), array("theme_js_name", "theme_js_name"),
+			array("theme_js_slug", "theme_js_slug"))
 			->from(self::TABLE_JAVASCRIPT)
 			->where("theme_js_theme_id", "=", $theme_id)->as_object()->execute();
-		$stylesheets = DB::select(array("theme_css_id", "theme_css_id"), array("theme_css_name", "theme_css_name"))
+		$stylesheets = DB::select(array("theme_css_id", "theme_css_id"), array("theme_css_name", "theme_css_name"),
+			array("theme_css_slug", "theme_css_slug"))
 			->from(self::TABLE_STYLES)
 			->where("theme_css_theme_id", "=", $theme_id)->as_object()->execute();
 			

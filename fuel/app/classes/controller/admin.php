@@ -1003,6 +1003,61 @@ class Controller_Admin extends Controller_Template {
 		}
 		else
 		{
+			$component_name = "";
+			$component_slug = "";
+			
+			switch($theme_component)
+			{
+				case CMSTheme::LAYOUT_PREFIX:
+					
+					foreach($theme_data->{CMSTheme::LAYOUT_PREFIX} as $layout)
+					{
+						if($layout->theme_layout_id == $component_id)
+						{
+							$component_name = $layout->theme_layout_name;
+							$component_slug = $layout->theme_layout_slug;
+						}
+					}
+					
+					break;
+				case CMSTheme::PARTIAL_PREFIX:
+					
+					foreach($theme_data->{CMSTheme::PARTIAL_PREFIX} as $partial)
+					{
+						if($partial->theme_partial_id == $component_id)
+						{
+							$component_name = $partial->theme_partial_name;
+							$component_slug = $partial->theme_partial_slug;
+						}
+					}
+					
+					break;
+				case CMSTheme::JS_PREFIX:
+					
+					foreach($theme_data->{CMSTheme::JS_PREFIX} as $javascript)
+					{
+						if($javascript->theme_js_id == $component_id)
+						{
+							$component_name = $javascript->theme_js_name;
+							$component_slug = $javascript->theme_js_slug;
+						}
+					}
+					
+					break;
+				case CMSTheme::CSS_PREFIX:
+					
+					foreach($theme_data->{CMSTheme::CSS_PREFIX} as $style)
+					{
+						if($style->theme_css_id == $component_id)
+						{
+							$component_name = $style->theme_css_name;
+							$component_slug = $style->theme_css_slug;
+						}
+					}
+					
+					break;
+			}
+			
 			$code_view_editor = View::forge("admin/partials/code-editor-code-panel",
 				array("editor_code" => $editor_code,
 					"editor_language" => $code_view->get_code_language(),
@@ -1010,7 +1065,9 @@ class Controller_Admin extends Controller_Template {
 					"theme_id" => $theme_id,
 					"theme_component" => $theme_component,
 					"component_id"=> $component_id,
-					"confirm" => $confirm));	
+					"confirm" => $confirm,
+					"component_name" => $component_name,
+					"component_slug" => $component_slug));	
 		}
 		
 		$this->build_admin_interface(View::forge("admin/partials/code-editor",

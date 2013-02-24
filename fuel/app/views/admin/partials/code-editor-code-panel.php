@@ -1,4 +1,4 @@
-<div style="padding:20px;">
+<div style="padding:20px; padding-top:0px;">
 	<?php echo(Asset::css("codemirror.css")); ?>
 	<?php echo(Asset::js("codemirror/lib/codemirror.js")); ?>
 	<?php echo(Asset::js("codemirror/mode/$editor_language/$editor_language.js")); ?>
@@ -6,6 +6,13 @@
 	<style type="text/css">
   		.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
     </style>
+    
+    <hr/>
+	
+	<p><strong>Component name:&nbsp;</strong><?php echo($component_name); ?></p>
+	<p><strong>Component slug:&nbsp;</strong><?php echo($component_slug); ?></p>
+	
+	<hr/>
 
 <?php
     if($confirm == 1)
