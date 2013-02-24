@@ -561,10 +561,21 @@ class Controller_Admin extends Controller_Template {
 
     public function action_index()
     {
-        // TODO: Dashboard
+        	
+		// Get data to render in the dashboard	
+        
+        $installed_extensions = Extension::get_installed_extensions(true);
+        $installed_themes = CMSTheme::get_installed_themes();
+		
+		foreach($installed_extensions as $extension)
+		{
+			$control_panel_button = AdminHelpers::build_bootstrap_button("", $extension->extension_folder."/admin", "Control Panel");
+			$extension->buttons = AdminHelpers::bootstrap_buttons(array($control_panel_button));
+		}
         
         $this->build_admin_interface(
-            View::forge("admin/partials/default-dashboard")
+            View::forge("admin/partials/default-dashboard",
+				array("extensions" => $installed_extensions, "themes" => $installed_themes))
         );
     }
 
@@ -872,11 +883,28 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_uninstalltheme($theme_id)
+    public function action_uninstalltheme($theme_id, $confirm = 0)
     {
-        CMSTheme::uninstall_theme($theme_id);
+    	$url_from = $this->get_referring_url();
 
-        Response::redirect(Uri::base().$this->controller_path."themes");
+        $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
+
+        $btn_yes = $this->build_bootstrap_button("uninstalltheme/$theme_id/1", "Yes");
+        $btn_no = $this->build_bootstrap_button($url_from, "No");
+		
+		if($confirm == 1)
+		{
+			// Confirm delete
+			CMSTheme::uninstall_theme($theme_id);
+	        Response::redirect(Uri::base().$this->controller_path."themes");	
+		}
+		else 
+		{
+			// Show interface to confirm
+		 	$this->build_admin_interface(
+	            View::forge("admin/partials/theme-delete", array("buttons" => array($btn_yes, $btn_no)))
+	        );
+		}
     }
 
     /**
@@ -892,6 +920,90 @@ class Controller_Admin extends Controller_Template {
 
         Response::redirect(Uri::base().$this->controller_path."themes");
     }
+	
+	/**
+	 * Manage individual CMS theme components
+	 * 
+	 * @param theme_id
+	 * @param theme_component
+	 * @param component_id
+	 */
+	
+	public function action_managetheme($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0)
+	{			
+		if(intval($theme_id) < 1)
+			throw new Exception_Theme("Invalid theme selected");	
+			
+		$language_mode = "";
+		$editor_code = "";
+		
+		switch($theme_component)
+		{
+			case CMSTheme::LAYOUT_PREFIX:
+				$language_mode = ObjectModel_CodeView::LAYOUT_VIEW;
+				
+				if($component_id > 0)
+				{
+					$editor_code = CMSTheme::get_installed_layout_content("", $theme_id, $component_id);
+				}
+				
+				break;
+			case CMSTheme::PARTIAL_PREFIX:
+				$language_mode = ObjectModel_CodeView::PARTIAL_VIEW;
+				
+				if($component_id > 0)
+				{
+					$editor_code = CMSTheme::get_installed_partial_content("", $theme_id, $component_id);
+				}
+				
+				break;
+			case CMSTheme::JS_PREFIX:
+				$language_mode = ObjectModel_CodeView::JS_VIEW;
+				
+				if($component_id > 0)
+				{
+					$editor_code = CMSTheme::get_installed_javascript_content("", $theme_id, $component_id);
+				}
+				
+				break;
+			case CMSTheme::CSS_PREFIX:
+				$language_mode = ObjectModel_CodeView::CSS_VIEW;
+				
+				if($component_id > 0)
+				{
+					$editor_code = CMSTheme::get_installed_style_content("", $theme_id, $component_id);
+				}
+				
+				break;
+		}
+		
+		$code_view = new ObjectModel_CodeView($language_mode);
+		$theme_data = CMSTheme::get_theme_components($theme_id);
+		
+		$sidebar = View::forge("admin/partials/code-editor-sidebar", 
+			array("controller_path" => Uri::base().$this->controller_path,
+				"theme_id" => $theme_id,
+				"layouts" => $theme_data->{CMSTheme::LAYOUT_PREFIX},
+				"partials" => $theme_data->{CMSTheme::PARTIAL_PREFIX},
+				"javascripts" => $theme_data->{CMSTheme::JS_PREFIX},
+				"stylesheets" => $theme_data->{CMSTheme::CSS_PREFIX}));
+		
+		$code_view_editor = "";
+		
+		if($component_id == 0)
+		{
+			$code_view_editor = View::forge("admin/partials/code-editor-empty");
+		}
+		else
+		{
+			$code_view_editor = View::forge("admin/partials/code-editor-code-panel",
+				array("editor_code" => $editor_code,
+					"editor_language" => $code_view->get_code_language()));	
+		}
+		
+		$this->build_admin_interface(View::forge("admin/partials/code-editor",
+			array("editor_sidebar" => $sidebar, "editor_editor" => $code_view_editor)));
+	}
 
     /**
      * The navigation management module
@@ -995,11 +1107,28 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_uninstallextension($extension_id)
+    public function action_uninstallextension($extension_id, $confirm = 0)
     {
-        Extension::uninstall_extension($extension_id);
+        $url_from = $this->get_referring_url();
 
-        Response::redirect(Uri::base().$this->controller_path."extensions");
+        $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
+
+        $btn_yes = $this->build_bootstrap_button("uninstallextension/$extension_id/1", "Yes");
+        $btn_no = $this->build_bootstrap_button($url_from, "No");
+			
+		if($confirm == 1)
+		{
+			// Confirm delete
+			Extension::uninstall_extension($extension_id);
+        	Response::redirect(Uri::base().$this->controller_path."extensions");
+		}
+		else 
+		{
+			// Show interface to confirm
+		 	$this->build_admin_interface(
+	            View::forge("admin/partials/extension-delete", array("buttons" => array($btn_yes, $btn_no)))
+	        );		
+		}	
     }
 
     /**

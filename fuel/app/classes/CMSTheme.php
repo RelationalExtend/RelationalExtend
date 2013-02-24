@@ -442,17 +442,26 @@ class CMSTheme {
      * @throws Exception_Theme
      * @param $layout_slug
      * @param int $theme_id
+	 * @param $layout_id
      * @return
      */
 
-    public static function get_installed_layout_content($layout_slug, $theme_id = 0)
+    public static function get_installed_layout_content($layout_slug, $theme_id = 0, $layout_id = 0)
     {
         $selected_theme_id = $theme_id;
 
         if($theme_id == 0)
             $selected_theme_id = self::get_installed_default_theme_id();
 
-        $layout_content = DB::select(ThemeInfo::SEGMENT_THEME_LAYOUT_CONTENT)->from(self::TABLE_THEME_LAYOUTS)
+		$layout_content = null;
+
+		if(($layout_slug == "") && ($layout_id > 0))
+			$layout_content = DB::select(ThemeInfo::SEGMENT_THEME_LAYOUT_CONTENT)->from(self::TABLE_THEME_LAYOUTS)
+                ->where(ThemeInfo::SEGMENT_THEME_LAYOUT_ID, "=", $layout_id)
+                ->and_where(ThemeInfo::SEGMENT_THEME_LAYOUT_THEME_ID, "=", $selected_theme_id)
+                ->as_object()->execute();
+		else
+        	$layout_content = DB::select(ThemeInfo::SEGMENT_THEME_LAYOUT_CONTENT)->from(self::TABLE_THEME_LAYOUTS)
                 ->where(ThemeInfo::SEGMENT_THEME_LAYOUT_SLUG, "=", $layout_slug)
                 ->and_where(ThemeInfo::SEGMENT_THEME_LAYOUT_THEME_ID, "=", $selected_theme_id)
                 ->as_object()->execute();
@@ -470,17 +479,26 @@ class CMSTheme {
      * @throws Exception_Theme
      * @param $partial_slug
      * @param int $theme_id
+	 * @param $partial_id
      * @return
      */
 
-    public static function get_installed_partial_content($partial_slug, $theme_id = 0)
+    public static function get_installed_partial_content($partial_slug, $theme_id = 0, $partial_id = 0)
     {
         $selected_theme_id = $theme_id;
 
         if($theme_id == 0)
             $selected_theme_id = self::get_installed_default_theme_id();
 
-        $partial_content = DB::select(ThemeInfo::SEGMENT_THEME_PARTIAL_CONTENT)->from(self::TABLE_THEME_PARTIALS)
+        $partial_content = null;
+        
+		if($partial_slug == "" && $partial_id > 0)
+			$partial_content = DB::select(ThemeInfo::SEGMENT_THEME_PARTIAL_CONTENT)->from(self::TABLE_THEME_PARTIALS)
+                ->where(ThemeInfo::SEGMENT_THEME_PARTIAL_ID, "=", $partial_id)
+                ->and_where(ThemeInfo::SEGMENT_THEME_PARTIAL_THEME_ID, "=", $selected_theme_id)
+                ->as_object()->execute();
+		else
+        	$partial_content = DB::select(ThemeInfo::SEGMENT_THEME_PARTIAL_CONTENT)->from(self::TABLE_THEME_PARTIALS)
                 ->where(ThemeInfo::SEGMENT_THEME_PARTIAL_SLUG, "=", $partial_slug)
                 ->and_where(ThemeInfo::SEGMENT_THEME_PARTIAL_THEME_ID, "=", $selected_theme_id)
                 ->as_object()->execute();
@@ -498,17 +516,26 @@ class CMSTheme {
      * @throws Exception_Theme
      * @param $js_slug
      * @param int $theme_id
+	 * @param $js_id
      * @return
      */
 
-    public static function get_installed_javascript_content($js_slug, $theme_id = 0)
+    public static function get_installed_javascript_content($js_slug, $theme_id = 0, $js_id = 0)
     {
         $selected_theme_id = $theme_id;
 
         if($theme_id == 0)
             $selected_theme_id = self::get_installed_default_theme_id();
 
-        $js_content = DB::select(ThemeInfo::SEGMENT_THEME_JS_CONTENT)->from(self::TABLE_JAVASCRIPT)
+		$js_content = null;
+        
+        if($js_slug == "" && $js_id > 0)
+			$js_content = DB::select(ThemeInfo::SEGMENT_THEME_JS_CONTENT)->from(self::TABLE_JAVASCRIPT)
+                ->where(ThemeInfo::SEGMENT_THEME_JS_ID, "=", $js_id)
+                ->and_where(ThemeInfo::SEGMENT_THEME_JS_THEME_ID, "=", $selected_theme_id)
+                ->as_object()->execute();
+		else
+        	$js_content = DB::select(ThemeInfo::SEGMENT_THEME_JS_CONTENT)->from(self::TABLE_JAVASCRIPT)
                 ->where(ThemeInfo::SEGMENT_THEME_JS_SLUG, "=", $js_slug)
                 ->and_where(ThemeInfo::SEGMENT_THEME_JS_THEME_ID, "=", $selected_theme_id)
                 ->as_object()->execute();
@@ -526,17 +553,26 @@ class CMSTheme {
      * @throws Exception_Theme
      * @param $css_slug
      * @param int $theme_id
+	 * @param css_id
      * @return
      */
 
-    public static function get_installed_style_content($css_slug, $theme_id = 0)
+    public static function get_installed_style_content($css_slug, $theme_id = 0, $css_id = 0)
     {
         $selected_theme_id = $theme_id;
 
         if($theme_id == 0)
             $selected_theme_id = self::get_installed_default_theme_id();
 
-        $css_content = DB::select(ThemeInfo::SEGMENT_THEME_CSS_CONTENT)->from(self::TABLE_STYLES)
+		$css_content = null;
+        
+        if($css_slug == "" && $css_id > 0)
+			$css_content = DB::select(ThemeInfo::SEGMENT_THEME_CSS_CONTENT)->from(self::TABLE_STYLES)
+                ->where(ThemeInfo::SEGMENT_THEME_CSS_ID, "=", $css_id)
+                ->and_where(ThemeInfo::SEGMENT_THEME_CSS_THEME_ID, "=", $selected_theme_id)
+                ->as_object()->execute();
+		else
+        	$css_content = DB::select(ThemeInfo::SEGMENT_THEME_CSS_CONTENT)->from(self::TABLE_STYLES)
                 ->where(ThemeInfo::SEGMENT_THEME_CSS_SLUG, "=", $css_slug)
                 ->and_where(ThemeInfo::SEGMENT_THEME_CSS_THEME_ID, "=", $selected_theme_id)
                 ->as_object()->execute();
@@ -721,17 +757,56 @@ class CMSTheme {
     /**
      * Gets a list of installed themes
      *
-     * @return array of themes
+     * @param theme_id
+	 * @return array of themes
      */
 
-    public static function get_installed_themes()
+    public static function get_installed_themes($theme_id = 0)
     {
         // Get installed themes
 
-        $themes = DB::select("*")->from("themes")->as_object()->execute();
+        $themes = DB::select("*")->from("themes");
+		
+		if($theme_id > 0)
+		{
+			$themes = $themes->where("theme_id", "=", $theme_id);
+		}
+		
+		$themes = $themes->as_object()->execute();
 
         return $themes;
     }
+	
+	/**
+	 * Returns all elements of a specific theme
+	 * 
+	 * @param theme_id
+	 * @return stdClass
+	 */
+	
+	public static function get_theme_components($theme_id)
+	{
+		$layouts = DB::select(array("theme_layout_id", "theme_layout_id"), array("theme_layout_name", "theme_layout_name"))
+			->from(self::TABLE_THEME_LAYOUTS)
+			->where("theme_layout_theme_id", "=", $theme_id)->as_object()->execute();
+		$partials = DB::select(array("theme_partial_id", "theme_partial_id"), array("theme_partial_name", "theme_partial_name"))
+			->from(self::TABLE_THEME_PARTIALS)
+			->where("theme_partial_theme_id", "=", $theme_id)->as_object()->execute();
+		$javascripts = DB::select(array("theme_js_id", "theme_js_id"), array("theme_js_name", "theme_js_name"))
+			->from(self::TABLE_JAVASCRIPT)
+			->where("theme_js_theme_id", "=", $theme_id)->as_object()->execute();
+		$stylesheets = DB::select(array("theme_css_id", "theme_css_id"), array("theme_css_name", "theme_css_name"))
+			->from(self::TABLE_STYLES)
+			->where("theme_css_theme_id", "=", $theme_id)->as_object()->execute();
+			
+		$theme_data = new stdClass();
+		$theme_data->{self::LAYOUT_PREFIX} = $layouts;
+		$theme_data->{self::PARTIAL_PREFIX} = $partials;
+		$theme_data->{self::JS_PREFIX} = $javascripts;
+		$theme_data->{self::CSS_PREFIX} = $stylesheets;
+		
+		return $theme_data;
+	}
 
     /**
      * Executes a theme and its logic

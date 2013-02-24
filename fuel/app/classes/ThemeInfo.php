@@ -17,6 +17,7 @@ class ThemeInfo {
     const SEGMENT_THEME_ACTIVE = "theme_active";
     const SEGMENT_THEME_INSTALL_TIME = "theme_install_time";
 
+	const SEGMENT_THEME_LAYOUT_ID = "theme_layout_id";
     const SEGMENT_THEME_LAYOUT_NAME = "theme_layout_name";
     const SEGMENT_THEME_LAYOUT_SLUG = "theme_layout_slug";
     const SEGMENT_THEME_LAYOUT_CONTENT = "theme_layout_content";
@@ -25,6 +26,7 @@ class ThemeInfo {
     const SEGMENT_THEME_LAYOUT_LAST_EDIT_TIME = "theme_layout_last_edit_time";
     const SEGMENT_THEME_LAYOUT_THEME_ID = "theme_layout_theme_id";
 
+    const SEGMENT_THEME_PARTIAL_ID = "theme_partial_id";
     const SEGMENT_THEME_PARTIAL_NAME = "theme_partial_name";
     const SEGMENT_THEME_PARTIAL_SLUG = "theme_partial_slug";
     const SEGMENT_THEME_PARTIAL_CONTENT = "theme_partial_content";
@@ -32,11 +34,13 @@ class ThemeInfo {
     const SEGMENT_THEME_PARTIAL_LAST_EDIT_TIME = "theme_partial_last_edit_time";
     const SEGMENT_THEME_PARTIAL_THEME_ID = "theme_partial_theme_id";
 
+    const SEGMENT_THEME_JS_ID = "theme_js_id";
     const SEGMENT_THEME_JS_NAME = "theme_js_name";
     const SEGMENT_THEME_JS_SLUG = "theme_js_slug";
     const SEGMENT_THEME_JS_CONTENT = "theme_js_content";
     const SEGMENT_THEME_JS_THEME_ID = "theme_js_theme_id";
 
+    const SEGMENT_THEME_CSS_ID = "theme_css_id";
     const SEGMENT_THEME_CSS_NAME = "theme_css_name";
     const SEGMENT_THEME_CSS_SLUG = "theme_css_slug";
     const SEGMENT_THEME_CSS_CONTENT = "theme_css_content";

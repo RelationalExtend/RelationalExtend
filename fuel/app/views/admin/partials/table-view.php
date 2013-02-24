@@ -1,8 +1,8 @@
 <div class="container">
-    <div class="hero-unit">
-        <h1><?php echo($page_title); ?></h1>
-        <p><?php echo($page_title_content); ?></p>
-    </div>
+	
+    <h1><?php echo($page_title); ?></h1>
+    <hr/>
+    <p><?php echo($page_title_content); ?></p>
 
     <table class="table">
         <thead>
