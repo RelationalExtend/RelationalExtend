@@ -753,6 +753,82 @@ class CMSTheme {
 
         DB::commit_transaction();
     }
+	
+	/**
+	 * Saves a layout
+	 * 
+	 * @param theme_id
+	 * @param layout_id
+	 * @param content
+	 * @return update_result
+	 */
+	
+	public static function save_layout_component($theme_id, $layout_id, $content)
+	{
+		$result = DB::update(self::TABLE_THEME_LAYOUTS)
+			->set(array("theme_layout_content" => $content))
+			->where("theme_layout_id", "=", $layout_id)
+			->execute();
+			
+		return $result;
+	}
+	
+	/**
+	 * Saves a partial
+	 * 
+	 * @param theme_id
+	 * @param partial_id
+	 * @param content
+	 * @return update_result
+	 */
+	
+	public static function save_partial_component($theme_id, $partial_id, $content)
+	{
+		$result = DB::update(self::TABLE_THEME_PARTIALS)
+			->set(array("theme_partial_content" => $content))
+			->where("theme_partial_id", "=", $partial_id)
+			->execute();
+			
+		return $result;
+	}
+	
+	/**
+	 * Saves a javascript
+	 * 
+	 * @param theme_id
+	 * @param javascript_id
+	 * @param content
+	 * @return update_result
+	 */
+	
+	public static function save_javascript_component($theme_id, $javascript_id, $content)
+	{
+		$result = DB::update(self::TABLE_JAVASCRIPT)
+			->set(array("theme_js_content" => $content))
+			->where("theme_js_id", "=", $javascript_id)
+			->execute();
+			
+		return $result;
+	}
+	
+	/**
+	 * Saves a stylesheet
+	 * 
+	 * @param theme_id
+	 * @param style_id
+	 * @param content
+	 * @return update_result
+	 */
+	
+	public static function save_style_component($theme_id, $style_id, $content)
+	{
+		$result = DB::update(self::TABLE_STYLES)
+			->set(array("theme_css_content" => $content))
+			->where("theme_css_id", "=", $style_id)
+			->execute();
+			
+		return $result;
+	}
 
     /**
      * Gets a list of installed themes

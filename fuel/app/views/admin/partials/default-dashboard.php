@@ -31,8 +31,11 @@
     <hr/>
     <table class="table table-bordered">
 		<tr>
-			<td>
+			<td style="width:80%;">
 				<strong>Theme</strong>
+			</td>
+			<td>
+				&nbsp;
 			</td>
 		</tr>
 <?php
@@ -40,6 +43,7 @@
 ?>
 			<tr>
 				<td><?php echo($theme->theme_name); ?></td>
+				<td><?php echo($theme->buttons); ?></td>
 			</tr>
 <?php
 	}

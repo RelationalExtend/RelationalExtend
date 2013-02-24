@@ -572,7 +572,13 @@ class Controller_Admin extends Controller_Template {
 			$control_panel_button = AdminHelpers::build_bootstrap_button("", $extension->extension_folder."/admin", "Control Panel");
 			$extension->buttons = AdminHelpers::bootstrap_buttons(array($control_panel_button));
 		}
-        
+		
+		foreach($installed_themes as $theme)
+        {
+        	$manage_button = AdminHelpers::build_bootstrap_button("", $this->controller_path."managetheme/".$theme->theme_id, "Manage theme");
+			$theme->buttons = AdminHelpers::bootstrap_buttons(array($manage_button));
+        }
+		
         $this->build_admin_interface(
             View::forge("admin/partials/default-dashboard",
 				array("extensions" => $installed_extensions, "themes" => $installed_themes))
@@ -828,12 +834,13 @@ class Controller_Admin extends Controller_Template {
             if($theme_installed) {
                 $activate_button = $this->build_bootstrap_button("activatetheme/$theme_id", "Activate");
                 $uninstall_button = $this->build_bootstrap_button("uninstalltheme/$theme_id", "Delete");
+				$manage_button = $this->build_bootstrap_button("managetheme/$theme_id", "Manage");
 
                 if($theme_active == 1) {
-                    $theme_data["buttons"] = array($uninstall_button);
+                    $theme_data["buttons"] = array($uninstall_button, $manage_button);
                 }
                 else {
-                    $theme_data["buttons"] = array($activate_button, $uninstall_button);
+                    $theme_data["buttons"] = array($activate_button, $uninstall_button, $manage_button);
                 }
             }
             else {
@@ -929,7 +936,7 @@ class Controller_Admin extends Controller_Template {
 	 * @param component_id
 	 */
 	
-	public function action_managetheme($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0)
+	public function action_managetheme($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0, $confirm = 0)
 	{			
 		if(intval($theme_id) < 1)
 			throw new Exception_Theme("Invalid theme selected");	
@@ -998,11 +1005,52 @@ class Controller_Admin extends Controller_Template {
 		{
 			$code_view_editor = View::forge("admin/partials/code-editor-code-panel",
 				array("editor_code" => $editor_code,
-					"editor_language" => $code_view->get_code_language()));	
+					"editor_language" => $code_view->get_code_language(),
+					"controller_path" => $this->controller_path,
+					"theme_id" => $theme_id,
+					"theme_component" => $theme_component,
+					"component_id"=> $component_id,
+					"confirm" => $confirm));	
 		}
 		
 		$this->build_admin_interface(View::forge("admin/partials/code-editor",
 			array("editor_sidebar" => $sidebar, "editor_editor" => $code_view_editor)));
+	}
+
+	/**
+	 * Saves a specific component of a theme
+	 * 
+	 * @param theme_id
+	 * @param theme_component
+	 * @param component_id
+	 */
+
+	public function action_savethemecomponent($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0)
+	{
+		$content = Input::post("code", false);
+		
+		if($content != false)
+		{
+			switch($theme_component)
+			{
+				case CMSTheme::LAYOUT_PREFIX:
+					CMSTheme::save_layout_component($theme_id, $component_id, $content);
+					break;
+				case CMSTheme::PARTIAL_PREFIX:
+					CMSTheme::save_partial_component($theme_id, $component_id, $content);
+					break;
+				case CMSTheme::JS_PREFIX:
+					CMSTheme::save_javascript_component($theme_id, $component_id, $content);
+					break;
+				case CMSTheme::CSS_PREFIX:
+					CMSTheme::save_style_component($theme_id, $component_id, $content);
+					break;
+			}
+			
+			Response::redirect($this->controller_path."managetheme/$theme_id/$theme_component/$component_id/1");
+		}
+		
+		Response::redirect($this->controller_path."managetheme/$theme_id/$theme_component/$component_id/0");
 	}
 
     /**
