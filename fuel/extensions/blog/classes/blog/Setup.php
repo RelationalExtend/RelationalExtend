@@ -34,7 +34,7 @@ class Blog_Setup extends \ExtensionSetup implements \ISetup {
             new \DBFieldMeta("Blog title", "blog_title", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_SIMPLE_TEXT, ""),
             new \DBFieldMeta("Blog cover image", "blog_cover_image", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_FILE, ""),
             new \DBFieldMeta("Blog slug","blog_slug", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_HIDDEN, ""),
-            new \DBFieldMeta("Blog category","blog_category", \DBFieldMeta::FIELD_BIGINT, 0, \DBFieldMeta::CONTROL_MULTISELECT,
+            new \DBFieldMeta("Blog category","blog_category", \DBFieldMeta::FIELD_VARCHAR, 200, \DBFieldMeta::CONTROL_MULTISELECT,
                 "table=".self::TABLE_CATEGORIES."|id_field=id|description_field=blog_category|relationship_table=".self::TABLE_CATEGORIES_RELATIONSHIPS),
             new \DBFieldMeta("Blog summary","blog_summary", \DBFieldMeta::FIELD_TEXT, 0, \DBFieldMeta::CONTROL_RICH_EDIT, ""),
             new \DBFieldMeta("Blog content","blog_content", \DBFieldMeta::FIELD_TEXT, 0, \DBFieldMeta::CONTROL_RICH_EDIT, ""),
