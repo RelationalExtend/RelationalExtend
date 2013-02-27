@@ -47,6 +47,85 @@ class AdminHelpers {
 
         return $control;
     }
+	
+	/**
+     * Returns multiple select records from a table
+     *
+     * @static
+     * @param $control_name
+     * @param $table_name
+     * @param $id_field
+     * @param $description_field
+	 * @param $relationship_table
+     * @param $selected_values
+     * @param string $sort_direction
+     * @return records
+     */
+	
+	private static function checkbox_list($control_name, $table_name, $id_field, $description_field, $relationship_table,
+		$selected_values = array(), $sort_direction = "asc")
+	{
+		$records = DB::select(array($id_field, 'id'), array($description_field, 'description'))
+            ->from($table_name)->order_by($description_field, $sort_direction)
+            ->as_object()->execute();
+
+        $control = "<p style='padding-left:20px;'><input type='checkbox' name='".$control_name."[]' value='{{ value }}' {{ selected }} /> &nbsp;{{ display_value }}</p>";
+        $options_string = "";
+
+        foreach($records as $record)
+        {
+            $selected = "";
+
+            if(count($selected_values) > 0)
+            {
+            	if(in_array($record->id, $selected_values))
+				{
+					$selected = "checked";
+				}
+            }
+			
+			$control_string = str_replace("{{ value }}", $record->id, $control);
+			$control_string = str_replace("{{ selected }}", $selected, $control_string);
+			$control_string = str_replace("{{ display_value }}", $record->description, $control_string);
+
+            $options_string.= $control_string;
+        }
+
+        $output_string = "<div style='padding-top:10px;padding-bottom:10px;'><input type='hidden' name='checkbox_".$control_name."' value='$relationship_table' />";
+		$output_string.=$options_string;
+		$output_string.="</div>";
+
+        return $output_string;
+	}
+
+	/**
+	 * Returns selected values for a relationship
+	 *
+	 * @param relationship_table
+	 * @param master_id
+	 * @return array of selected values
+	 */
+
+	private static function get_checkbox_list_selected_value($relationship_table, $master_id = 0)
+	{
+		$fields = DB::select(array(DBFieldMeta::FIELD_RELATIONSHIP_MASTER_FIELD, "id_master"),
+			array(DBFieldMeta::FIELD_RELATIONSHIP_DETAIL_FIELD, "id_detail"))->from($relationship_table);
+		
+		$fields = $fields->where(DBFieldMeta::FIELD_RELATIONSHIP_MASTER_FIELD, "=", $master_id);
+		$fields = $fields->as_object()->execute();
+		
+		$field_value_array = array();
+			
+		if(count($fields) > 0)
+		{
+			foreach($fields as $field)
+			{
+				$field_value_array[] = $field->{DBFieldMeta::FIELD_RELATIONSHIP_DETAIL_FIELD};
+			}
+		}
+		
+		return $field_value_array;
+	}
 
 
     /**
@@ -177,6 +256,42 @@ class AdminHelpers {
                     throw new Exception_Extension("Values table, id_field, description_field not set in the array");
                 }
                 break;
+			case DBFieldMeta::CONTROL_MULTISELECT:
+				$meta_values = explode("|", $control_meta_values);
+                    
+                if(!is_array($meta_values))
+                {
+                    throw new Exception_Extension("The values supplied for multi select are not in an array");
+                }
+				
+				$meta_record = new stdClass();
+
+                foreach($meta_values as $meta_value)
+                {
+                    list($meta_value_key, $meta_value_value) = explode("=", $meta_value);
+                    $meta_record->{$meta_value_key} = $meta_value_value;
+                }
+				
+				if(isset($meta_record->table) && isset($meta_record->id_field) && isset($meta_record->description_field)
+					&& isset($meta_record->relationship_table))
+                {
+                    $sort_direction = isset($meta_record->sort_direction) ? $meta_record->sort_direction :  "asc";
+                    
+                    $selected_values = null;
+                    
+                    if(isset($record_value->id))
+                    	$selected_values = self::get_checkbox_list_selected_value($meta_record->relationship_table, $record_value->id);
+					else
+						$selected_values = self::get_checkbox_list_selected_value($meta_record->relationship_table, 0);
+					
+                    $return_string = self::checkbox_list($control_name, $meta_record->table, $meta_record->id_field, $meta_record->description_field, 
+                    	$meta_record->relationship_table, $selected_values, $sort_direction);
+                }
+                else
+                {
+                    throw new Exception_Extension("Values table, id_field, description_field not set in the array");
+                }
+				break; 
             case DBFieldMeta::CONTROL_MULTI_TEXT:
                 $return_string = "<textarea name='$control_name' rows='10' cols='160' style='width:100%;'>$values</textarea>";
                 break;

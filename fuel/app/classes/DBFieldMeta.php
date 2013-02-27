@@ -15,6 +15,12 @@ class DBFieldMeta {
     const FIELD_TIMESTAMP = "timestamp";
     const FIELD_TEXT = "text";
     const FIELD_LIST = "enum";
+	
+	const FIELD_RELATIONSHIP_MASTER_FIELD_CAPTION = "ID Master";
+	const FIELD_RELATIONSHIP_DETAIL_FIELD_CAPTION = "ID Detail";
+	
+	const FIELD_RELATIONSHIP_MASTER_FIELD = "id_master";
+	const FIELD_RELATIONSHIP_DETAIL_FIELD = "id_detail";
 
     const CONTROL_SIMPLE_TEXT = "simpletext";
     const CONTROL_NUMERIC = "numeric";
@@ -25,6 +31,7 @@ class DBFieldMeta {
     const CONTROL_TABULAR_LIST = "external_list";
     const CONTROL_HIDDEN = "hidden";
     const CONTROL_CHECKBOX = "checkbox";
+	const CONTROL_MULTISELECT = "multiselect";
     const CONTROL_FILE = "file";
 
     public $field_name;

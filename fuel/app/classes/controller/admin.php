@@ -315,7 +315,7 @@ class Controller_Admin extends Controller_Template {
      * @return null
      */
 
-    protected function special_field_operation($field_name, $value_sets)
+    public function special_field_operation($field_name, $value_sets)
     {
         // To be overridden
         return null;
@@ -641,105 +641,14 @@ class Controller_Admin extends Controller_Template {
 
         if($object_meta_data == null)
             throw new Exception_CMS("The object $object does not exist in the database");
+		
+		// Get the stuff to save to the database
 
-        if($record_id > 0) {
-            $update_object = DB::update($object)->where("id", "=", $record_id);
-        }
-        else {
-            $update_object = DB::insert($object);
-        }
-
-        $database_array = array();
-
-        // Process each field
-
-        foreach($object_meta_data as $object_meta_data_item)
-        {
-            $value_to_set = "";
-            $skip_control = false;
-            
-            switch($object_meta_data_item->{Extension_ObjectMeta::SEGMENT_OBJECT_META_CONTROL}) {
-                case DBFieldMeta::CONTROL_SIMPLE_TEXT:
-                    $value_to_set = trim(Input::post($object_meta_data_item->object_meta_slug));
-                    break;
-                case DBFieldMeta::CONTROL_NUMERIC:
-                    $value_to_set = floatval(Input::post($object_meta_data_item->object_meta_slug));
-                    break;
-                case DBFieldMeta::CONTROL_MULTI_TEXT:
-                    $value_to_set = trim(Input::post($object_meta_data_item->object_meta_slug));
-                    break;
-                case DBFieldMeta::CONTROL_RICH_EDIT:
-                    $value_to_set = trim(Input::post($object_meta_data_item->object_meta_slug));
-                    break;
-                case DBFieldMeta::CONTROL_LIST:
-                    $value_to_set = Input::post($object_meta_data_item->object_meta_slug);
-                    break;
-                case DBFieldMeta::CONTROL_TABULAR_LIST:
-                    $value_to_set = Input::post($object_meta_data_item->object_meta_slug);
-                    break;
-                case DBFieldMeta::CONTROL_CHECKBOX:
-                    $value_to_set = isset($_POST[$object_meta_data_item->object_meta_slug]) ? 1 : 0;
-                    break;
-                case DBFieldMeta::CONTROL_HIDDEN:
-                    $value_to_set = $this->special_field_operation($object_meta_data_item->object_meta_slug, Input::post());
-                        
-                    if($value_to_set == false) {
-                        $skip_control = true;
-                    }
-                    break;
-                case DBFieldMeta::CONTROL_FILE:
-
-                    $upload_error = $_FILES[$object_meta_data_item->object_meta_slug]["error"];
-
-                    $value_to_set = ($upload_error == UPLOAD_ERR_OK) ?
-                            $_FILES[$object_meta_data_item->object_meta_slug]["name"] : "";
-
-                    if($upload_error != UPLOAD_ERR_OK)
-                    {
-                        $skip_control = true;
-                    }
-
-                    break;
-            }
-
-            if(!$skip_control)
-                $database_array[$object_meta_data_item->object_meta_slug] = $value_to_set;
-        }
+        $database_array = ObjectModel_FormView::get_records_to_save($object_meta_data, $this);
 
         // Save records and get record ids
 
-        $insert_id = 0;
-        $rows_affected = 0;
-
-        if(count($database_array) > 0)
-        {
-            if($record_id > 0)
-            {
-                $rows_affected = $update_object->set($database_array)->execute();
-                $insert_id = $record_id;
-            }
-            else {
-                list($insert_id, $rows_affected) = $update_object->set($database_array)->execute();
-            }
-
-            // Process and upload files afresh with their new destination names
-
-            $media_destination_path = $media_upload_path == null ?
-                    UPLOADPATH : UPLOADPATH.rtrim($media_upload_path, "/")."/";
-
-            foreach($object_meta_data as $object_meta_data_item)
-            {
-                if($object_meta_data_item->{Extension_ObjectMeta::SEGMENT_OBJECT_META_CONTROL} == DBFieldMeta::CONTROL_FILE)
-                {
-                    if($_FILES[$object_meta_data_item->object_meta_slug]["error"] == UPLOAD_ERR_OK)
-                    {
-                        $uploaded_file = $_FILES[$object_meta_data_item->object_meta_slug]["tmp_name"];
-                        $file_name = $_FILES[$object_meta_data_item->object_meta_slug]["name"];
-                        move_uploaded_file($uploaded_file, $media_destination_path.$insert_id."_".$file_name);
-                    }
-                }
-            }
-        }
+        $result = ObjectModel_FormView::save_records_to_db($object, $record_id, $object_meta_data, $database_array, $media_upload_path);
 
         // Finalize
 

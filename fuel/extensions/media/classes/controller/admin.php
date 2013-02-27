@@ -34,7 +34,7 @@ class Controller_Admin extends \cms\Controller_CMS {
         parent::action_update(Media_Setup::TABLE_MEDIA);
     }
 
-    protected function special_field_operation($field_name, $value_sets)
+    public function special_field_operation($field_name, $value_sets)
     {
         $value = null;
 
