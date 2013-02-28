@@ -46,6 +46,9 @@ return array(
 	 * Groups as id => array(name => <string>, roles => <array>)
 	 */
 	'groups' => array(
+		'100' => array('name' => 'Super Admin', 'roles' => array('Admin', 'Developer', 'Content')),
+		'101' => array('name' => 'Developer', 'roles' => array('Developer', 'Content')),
+		'102' => array('name' => 'Content Manager', 'roles' => array('Content')),
 		/**
 		 * Examples
 		 * ---
@@ -56,9 +59,6 @@ return array(
 		 * 50   => array('name' => 'Moderators', 'roles' => array('user', 'moderator')),
 		 * 100  => array('name' => 'Administrators', 'roles' => array('user', 'moderator', 'admin')),
 		 */
-            1    => array('name' => 'Users', 'roles' => array('user')),
-            50   => array('name' => 'Moderators', 'roles' => array('user', 'moderator')),
-            100  => array('name' => 'Administrators', 'roles' => array('user', 'moderator', 'admin', 'super')),
 	),
 
 	/**
@@ -83,15 +83,12 @@ return array(
 		 * Global allow by assigning true to a role (use with care!):
 		 *   'super' => true,
 		 */
-             'user'  => array('comments' => array('create', 'read')),
-             'moderator'  => array('comments' => array('update', 'delete')),
-             'super' => true,
 	),
 
 	/**
 	 * Salt for the login hash
 	 */
-	'login_hash_salt' => 'th1s=mY0Wn_$@|+KSI',
+	'login_hash_salt' => 'login_salt',
 
 	/**
 	 * $_POST key for login username
