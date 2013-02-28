@@ -7,7 +7,7 @@
  */
 
 class CMSUtil {
-    public static function create_pagination_records($table, &$query_object, $paged = true, $page_number = 1,
+    public static function create_pagination_records($table, &$query_object, $conditions = array(), $paged = true, $page_number = 1,
         $controller_path = "", $action_name = "", $page_size = 20)
     {
         $pagination_records = new stdClass();
@@ -26,6 +26,14 @@ class CMSUtil {
         if($paged)
         {
             $num_pages_query = DB::select(DB::expr("COUNT(*) AS num_rows"))->from($table);
+			
+			if(is_array($conditions))
+			{
+				foreach($conditions as $condition => $value)
+				{
+					$num_pages_query = $num_pages_query->where($condition, "=", $value);
+				}
+			}
 
             $num_pages_query = $num_pages_query->as_object()->execute();
 

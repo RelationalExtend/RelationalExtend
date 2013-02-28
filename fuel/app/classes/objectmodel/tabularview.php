@@ -19,6 +19,7 @@ class ObjectModel_TabularView {
     public $direction = 'asc';
     public $controller_path = "";
     public $records_not_in = array();
+	public $filter_conditions = array();
 
     public $add_button_visible = true;
     public $edit_button_visible = true;
@@ -101,7 +102,8 @@ class ObjectModel_TabularView {
     public function paged_results($action_name)
     {
         $this->pagination_records = CMSUtil::create_pagination_records($this->table_name, $this->records,
-            $this->paged, $this->page_number, $this->controller_path, $action_name, $this->page_size);
+            $this->filter_conditions, $this->paged, $this->page_number, $this->controller_path, $action_name, 
+            $this->page_size);
 
         return $this->pagination_records;
     }
@@ -141,6 +143,17 @@ class ObjectModel_TabularView {
                     }
                 }
             }
+			
+			if(is_array($this->filter_conditions))
+			{
+				if(count($this->filter_conditions) > 0)
+				{
+					foreach($this->records_not_in as $field => $record_condition)
+                    {
+                        $this->records = $this->records->where($field, '=', $record_condition);
+                    }
+				}
+			}
 
             $this->record_objects = $this->records->as_object()->execute();
             $this->executed = true;

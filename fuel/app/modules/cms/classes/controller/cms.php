@@ -28,8 +28,13 @@ class Controller_CMS extends \Controller_Admin {
      * @return void
      */
 
-    public function action_login()
+    public function action_login($status = "")
     {
+    	$messages = array();
+		
+    	if($status == "nosuccess")
+			$messages[] = "Invalid login user name / password";
+    	
         $user_name = \Fuel\Core\Input::post("username", null);
         $password = \Fuel\Core\Input::post("password", null);
        
@@ -37,7 +42,12 @@ class Controller_CMS extends \Controller_Admin {
         {   
             $auth = \Auth\Auth::instance();
             if($auth->login($user_name, $password))
-                \Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."index");
+			{
+				\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."index");
+			}    
+			else {
+				\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."login/nosuccess");
+			}
         }
 		
 		// Create a default user if non exists
@@ -51,8 +61,22 @@ class Controller_CMS extends \Controller_Admin {
 		}
 
         $this->build_admin_interface(
-            \Fuel\Core\View::forge("admin/partials/login", array('form_action' => \Fuel\Core\Uri::base().$this->controller_path))
+            \Fuel\Core\View::forge("admin/partials/login", 
+            array('form_action' => \Fuel\Core\Uri::base().$this->controller_path, 'messages' => $messages))
         );
+    }
+	
+	/**
+     * Logs out the current user
+     *
+     * @return void
+     */
+
+    public function action_logout()
+    {
+        \Auth\Auth::logout();
+
+        \Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."login");
     }
 	
 	/**
@@ -89,6 +113,8 @@ class Controller_CMS extends \Controller_Admin {
 
     public function admin_users($status = "")
     {
+    	$this->check_access_level_admin();
+		
 		$messages = array();
 
         if($status == "successfulcreate")
@@ -138,6 +164,8 @@ class Controller_CMS extends \Controller_Admin {
 
     public function action_createuser($status = "")
     {
+    	$this->check_access_level_admin();
+		
         $user_name = \Fuel\Core\Input::post("user_name", null);
         $email_address = \Fuel\Core\Input::post("email_address", null);
         $password = \Fuel\Core\Input::post("password", null);
@@ -165,6 +193,8 @@ class Controller_CMS extends \Controller_Admin {
 
     public function action_deleteuser($user_name = "")
     {
+    	$this->check_access_level_admin();
+		
         if($user_name != "") {
             $result = \Auth\Auth::instance()->delete_user($user_name);
 
@@ -186,6 +216,8 @@ class Controller_CMS extends \Controller_Admin {
 	
 	public function action_updatepassword($user_name = "")
 	{
+		$this->check_access_level_admin();
+		
 		if($user_name != "")
 		{
 			$old_password = \Fuel\Core\Input::post("old_password", false);
