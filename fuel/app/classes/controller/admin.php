@@ -471,29 +471,6 @@ class Controller_Admin extends Controller_Template {
     }
 
     /**
-     * Default login action
-     *
-     * @return void
-     */
-
-    public function action_login()
-    {
-        $user_name = Input::post("username", null);
-        $password = Input::post("password", null);
-       
-        if($user_name != null && $password != null)
-        {   
-            $auth = Auth::instance();
-            if($auth->login($user_name, $password))
-                Response::redirect(Uri::base().$this->controller_path."index");
-        }
-
-        $this->build_admin_interface(
-            View::forge("admin/partials/login", array('form_action' => Uri::base().$this->controller_path))
-        );
-    }
-
-    /**
      * Logs out the current user
      *
      * @return void
@@ -1195,10 +1172,10 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_users()
+    public function action_users($status = "")
     {
         if($this->admin_users_function) {
-            $this->admin_users();
+            $this->admin_users($status);
         }
         else {
             throw new HttpNotFoundException();

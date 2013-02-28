@@ -3,12 +3,12 @@
         <input type="text" class="input-small" placeholder="Email / Username" name="username">
         <input type="password" class="input-small" placeholder="Password" name="password">
 
+        <!--
         <label class="checkbox">
             <input type="checkbox" name="remember_me"> Remember me
         </label>
-
-        <p style="padding-top:10px; margin-right:230px;">
-            <button type="submit" class="btn">Sign in</button>
-        </p>
+        -->
+        
+        <button type="submit" class="btn">Sign in</button>
     </form>
 </div>
