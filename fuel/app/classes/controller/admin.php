@@ -40,6 +40,10 @@ class Controller_Admin extends Controller_Template {
     protected $admin_settings_function = false;
     protected $admin_navigation_function = false;
     protected $admin_users_function = false;
+    
+	protected $user_can_access_content = true;
+	protected $user_can_access_developer = true;
+	protected $user_can_access_admin = true;
 
     protected $is_abstract_controller = true;
 
@@ -79,6 +83,23 @@ class Controller_Admin extends Controller_Template {
             $user = Auth::instance()->get_user_id();
             $this->user_id = $user[1];
             $this->user_details = $this->get_user_details($this->user_id);
+			
+			$this->user_can_access_admin = false;
+			$this->user_can_access_developer = false;
+			$this->user_can_access_content = false;
+			
+			// Set up roles
+			
+			$roles = Auth::group()->get_roles($this->user_details["group"]);
+			
+			if(in_array("Admin", $roles))
+				$this->user_can_access_admin = true;
+			
+			if(in_array("Developer", $roles))
+				$this->user_can_access_developer = true;
+			
+			if(in_array("Content", $roles))
+				$this->user_can_access_content = true;
             
             $this->logged_in = true;
 
@@ -94,6 +115,90 @@ class Controller_Admin extends Controller_Template {
             return false;
         }
     }
+
+	/**
+     * Check on authentication status
+     *
+     * @param string $login_url
+     * @param bool $redirect
+     * @return bool
+     */
+
+    public function check_auth_status($login_url = "admin/login", $redirect = false)
+    {
+
+        $this->public_urls = array(
+            "login",
+            "signup"
+        );
+
+        $uri_string = explode('/', Uri::string());
+
+        $num_params = count($uri_string);
+
+        if ($uri_string[$num_params - 2] == 'admin' and
+                ($uri_string[$num_params -1] == 'login' or $uri_string[$num_params -1] == 'signup' or
+                 $uri_string[$num_params -1] == 'dologin'))
+        {
+            return false;
+        }
+        else
+        {
+            if(Auth::check())
+            {
+                $user = Auth::instance()->get_user_id();
+                $this->user_id = $user[1];
+                $this->user_details = $this->get_user_details($this->user_id);
+
+                return true;
+            }
+            else
+            {
+                if($redirect) {
+                    Response::redirect(Uri::base().$login_url);
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    }
+
+	/**
+	 * Check to see if access is available to admin level
+	 */
+
+	protected function check_access_level_admin()
+	{
+		if(!$this->user_can_access_admin)
+		{
+			Response::redirect(Uri::base().$this->controller_path."unauthorizedaccess");
+		}
+	}
+	
+	/**
+	 * Check to see if access is available to developer level
+	 */
+	
+	protected function check_access_level_developer()
+	{
+		if(!$this->user_can_access_developer)
+		{
+			Response::redirect(Uri::base().$this->controller_path."unauthorizedaccess");
+		}
+	}
+	
+	/**
+	 * Check to see if access is available to content level
+	 */
+	
+	protected function check_access_level_content()
+	{
+		if(!$this->user_can_access_content)
+		{
+			Response::redirect(Uri::base().$this->controller_path."unauthorizedaccess");
+		}
+	}
 
     /**
      * Builds a menu item into a standard object
@@ -371,54 +476,6 @@ class Controller_Admin extends Controller_Template {
     }
 
     /**
-     * Check on authentication status
-     *
-     * @param string $login_url
-     * @param bool $redirect
-     * @return bool
-     */
-
-    public function check_auth_status($login_url = "admin/login", $redirect = false)
-    {
-
-        $this->public_urls = array(
-            "login",
-            "signup"
-        );
-
-        $uri_string = explode('/', Uri::string());
-
-        $num_params = count($uri_string);
-
-        if ($uri_string[$num_params - 2] == 'admin' and
-                ($uri_string[$num_params -1] == 'login' or $uri_string[$num_params -1] == 'signup' or
-                 $uri_string[$num_params -1] == 'dologin'))
-        {
-            return false;
-        }
-        else
-        {
-            if(Auth::check())
-            {
-                $user = Auth::instance()->get_user_id();
-                $this->user_id = $user[1];
-                $this->user_details = $this->get_user_details($this->user_id);
-
-                return true;
-            }
-            else
-            {
-                if($redirect) {
-                    Response::redirect(Uri::base().$login_url);
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-    }
-
-    /**
      * Gets extension installation status
      *
      * @param $extension
@@ -470,63 +527,12 @@ class Controller_Admin extends Controller_Template {
             $this->validate_authentication();
     }
 
-    /**
-     * Logs out the current user
-     *
-     * @return void
-     */
-
-    public function action_logout()
-    {
-        Auth::logout();
-
-        Response::redirect(Uri::base().$this->controller_path."login");
-    }
-    
-    /**
-     * Creates a user
-     *
-     * @param string $status
-     * @return void
-     */
-
-    public function action_createuser($status = "")
-    {
-        $user_name = Input::post("username", null);
-        $email_address = Input::post("password", null);
-        $password = Input::post("password", null);
-        $group = Input::post("group", null);
-
-        if($user_name != null && $password != null && $email_address != null && $group != null)
-        {
-            $result = Auth::instance()->create_user($user_name, $password, $email_address, $group);
-
-            if($result == false) {
-                Response::redirect(Uri::base().$this->controller_path."createuser/nosuccess");
-            }
-            else {
-                Response::redirect(Uri::base().$this->controller_path."users/successfulcreate");
-            }
-        }
-    }
-
-    /**
-     * Deletes a specific user
-     *
-     * @param string $user_name
-     * @return void
-     */
-
-    public function action_deleteuser($user_name = "")
-    {
-        if($user_name != "") {
-            $result = Auth::instance()->delete_user($user_name);
-
-            if($result == false) {
-                // What happens when we do not delete?
-            }
-        }
-    }
+    public function action_unauthorizedaccess()
+	{
+		$this->build_admin_interface(
+			View::forge("admin/partials/unauthorized-access")
+		);
+	}
 
     // Default actions
 
@@ -538,7 +544,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_index()
     {
-        	
+        $this->check_access_level_content();
+			
 		// Get data to render in the dashboard	
         
         $installed_extensions = Extension::get_installed_extensions(true);
@@ -574,6 +581,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_edit($table, $record_id = 0, $return_path = "", $success_string = "")
     {
+    	$this->check_access_level_content();
+		
         // Default edit interface
 
         $action = "Edit";
@@ -606,6 +615,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_update($media_upload_path = null)
     {
+    	$this->check_access_level_content();
+		
         $record_id = Input::post("record_id");
         $object = Input::post("object");
         $save_value = Input::post(AdminHelpers::save_button_value(), false);
@@ -662,6 +673,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_delete($table, $record_id, $confirm = 0)
     {
+    	$this->check_access_level_content();
+		
         // Default delete interface
 
         $url_from = $this->get_referring_url();
@@ -691,6 +704,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_themes()
     {
+    	$this->check_access_level_developer();
+		
         $core_themes = CMSTheme::get_public_themes();
 
         // Autoload not installed themes for their meta data
@@ -754,6 +769,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_installtheme($theme_folder, $activate = 0)
     {
+    	$this->check_access_level_developer();
+		
         if(!Module::loaded($theme_folder)) {
             CMSInit::load_theme($theme_folder);
         }
@@ -778,6 +795,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_uninstalltheme($theme_id, $confirm = 0)
     {
+    	$this->check_access_level_developer();
+		
     	$url_from = $this->get_referring_url();
 
         $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
@@ -809,6 +828,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_activatetheme($theme_id)
     {
+    	$this->check_access_level_developer();
+		
         CMSTheme::set_default_theme($theme_id);
 
         Response::redirect(Uri::base().$this->controller_path."themes");
@@ -823,7 +844,9 @@ class Controller_Admin extends Controller_Template {
 	 */
 	
 	public function action_managetheme($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0, $confirm = 0)
-	{			
+	{
+		$this->check_access_level_developer();
+					
 		if(intval($theme_id) < 1)
 			throw new Exception_Theme("Invalid theme selected");	
 			
@@ -970,6 +993,8 @@ class Controller_Admin extends Controller_Template {
 
 	public function action_savethemecomponent($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0)
 	{
+		$this->check_access_level_developer();
+		
 		$content = Input::post("code", false);
 		
 		if($content != false)
@@ -1004,6 +1029,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_navigation()
     {
+    	$this->check_access_level_content();
+		
         if($this->admin_navigation_function) {
             $this->admin_navigation();
         }
@@ -1020,6 +1047,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_extensions()
     {
+    	$this->check_access_level_developer();
+		
         $core_extensions = Extension::get_core_extensions();
 
         // Autoload not installed extensions to as to get the meta data
@@ -1082,6 +1111,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_installextension($extension_folder)
     {
+    	$this->check_access_level_developer();
+		
         if(!Module::loaded($extension_folder)) {
             CMSInit::load_extension($extension_folder);
         }
@@ -1100,6 +1131,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_uninstallextension($extension_id, $confirm = 0)
     {
+    	$this->check_access_level_developer();
+		
         $url_from = $this->get_referring_url();
 
         $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
@@ -1131,6 +1164,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_activateextension($extension_id)
     {
+    	$this->check_access_level_developer();
+		
         Extension::activate_extension($extension_id);
 
         Response::redirect(Uri::base().$this->controller_path."extensions");
@@ -1145,6 +1180,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_deactivateextension($extension_id)
     {
+    	$this->check_access_level_developer();
+		
         Extension::deactivate_extension($extension_id);
 
         Response::redirect(Uri::base().$this->controller_path."extensions");
@@ -1158,6 +1195,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_settings()
     {
+    	$this->check_access_level_admin();
+		
         if($this->admin_settings_function) {
             $this->admin_settings();
         }
@@ -1174,6 +1213,8 @@ class Controller_Admin extends Controller_Template {
 
     public function action_users($status = "")
     {
+    	$this->check_access_level_admin();
+		
         if($this->admin_users_function) {
             $this->admin_users($status);
         }
