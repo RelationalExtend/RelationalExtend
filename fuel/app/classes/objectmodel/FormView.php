@@ -82,7 +82,7 @@ class ObjectModel_FormView {
 	 * @return records_to_save
 	 */
 	
-	public static function get_records_to_save($object_meta_data, $controller)
+	public static function get_records_to_save($object, $object_meta_data, $controller)
 	{
 		$database_array = array();
 		
@@ -119,7 +119,11 @@ class ObjectModel_FormView {
                     $value_to_set = isset($_POST[$object_meta_data_item->object_meta_slug]) ? 1 : 0;
                     break;
                 case DBFieldMeta::CONTROL_HIDDEN:
-                    $value_to_set = $controller->special_field_operation($object_meta_data_item->object_meta_slug, Input::post());
+					
+					$value_sets = array('object_name' => $object);
+					$value_sets = array_merge(Input::post(), $value_sets);
+					
+                    $value_to_set = $controller->special_field_operation($object_meta_data_item->object_meta_slug, $value_sets);
                         
                     if($value_to_set == false) {
                         $skip_control = true;

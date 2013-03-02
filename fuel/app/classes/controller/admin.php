@@ -632,7 +632,7 @@ class Controller_Admin extends Controller_Template {
 		
 		// Get the stuff to save to the database
 
-        $database_array = ObjectModel_FormView::get_records_to_save($object_meta_data, $this);
+        $database_array = ObjectModel_FormView::get_records_to_save($object, $object_meta_data, $this);
 
         // Save records and get record ids
 

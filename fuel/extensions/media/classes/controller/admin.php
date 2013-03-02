@@ -37,6 +37,9 @@ class Controller_Admin extends \cms\Controller_CMS {
     public function special_field_operation($field_name, $value_sets)
     {
         $value = null;
+		
+		// If object name is needed
+		$object_name = $value_sets['object_name'];
 
         switch($field_name) {
             case "media_creation_time":
