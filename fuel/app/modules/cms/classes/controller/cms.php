@@ -238,4 +238,66 @@ class Controller_CMS extends \Controller_Admin {
 			}
 		}
 	}
+	
+	/**
+	 * Site settings
+	 * 
+	 * @param $extension_id
+	 * @param $confirm
+	 */
+	
+	public function admin_settings($extension_id = 0, $confirm = 0)
+	{
+		$extensions = \Extension::get_installed_extensions(true);
+		$settings = \Extension::get_extension_settings($extension_id);
+		
+		$component_name = "Sitewide settings";
+		$component_slug = null;
+		
+		if($extension_id > 0)
+		{
+			$extension_meta = \Extension::get_installed_extension_meta_data($extension_id);
+			
+			if(count($extension_meta) < 1)
+				throw new \Exception_Extension("Extension does not exist");
+			
+			$component_name = $extension_meta[0]->extension_name;
+			$component_slug = $extension_meta[0]->extension_slug;
+		}
+		
+		$settings_sidebar = \Fuel\Core\View::forge("admin/settings-sidebar", 
+			array("extensions" => $extensions, "controller_path" => \Fuel\Core\Uri::base().$this->controller_path));
+		$settings_content = \Fuel\Core\View::forge("admin/settings-settings-panel", 
+			array("settings" => $settings, "component_name" => $component_name, "component_slug" => $component_slug,
+				"confirm" => intval($confirm), "controller_path" => $this->controller_path, "extension_id" => $extension_id));
+		
+		$this->build_admin_interface(
+			\Fuel\Core\View::forge("admin/settings", array("settings_sidebar" => $settings_sidebar,
+				"settings_editor" => $settings_content))
+		);
+	}
+
+	/**
+	 * Saves settings for an extension
+	 *
+	 * @param $extension_od
+	 */
+
+	public function action_savesettings($extension_id)
+	{
+		$extension_settings = \Extension::get_extension_settings($extension_id);
+		
+		foreach($extension_settings as $extension_setting)
+		{
+			$setting_id = $extension_setting->id;
+			$setting_new_value = \Fuel\Core\Input::post("setting_".$setting_id, false);
+			
+			if($setting_new_value != false)
+			{
+				$result = \Extension::save_extension_setting($extension_id, $setting_id, $setting_new_value);
+			}
+		}
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."settings/$extension_id/1");
+	}
 }

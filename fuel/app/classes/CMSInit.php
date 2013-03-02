@@ -18,6 +18,8 @@ class CMSInit {
 
     private static $installed_extensions = array();
     private static $installed_themes = array();
+	
+	const TABLE_SETTINGS = "settings";
 
     public static function load_extension($extension_folder)
     {

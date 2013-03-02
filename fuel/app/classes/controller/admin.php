@@ -498,6 +498,48 @@ class Controller_Admin extends Controller_Template {
     {
         return CMSInit::is_theme_installed($theme);
     }
+	
+	/**
+	 * Gets a setting for an extension
+	 * 
+	 * @param $extension_slug
+	 * @param $extension_setting_slug
+	 * @return setting
+	 */
+
+	protected function get_extension_setting($extension_slug, $extension_setting_slug)
+	{
+		$extension = Extension::get_installed_extension_meta_data_by_slug($extension_slug);
+		
+		if(count($extension) < 1)
+			throw new Exception_Extension("Extension $extension_slug does not exist");
+		
+		$extension_id = $extension[0]->extension_id;
+		
+		$setting = Extension::get_extension_settings($extension_id, $extension_setting_slug);
+		
+		if(count($setting) < 1)
+			throw new Exception_Extension("Extension setting $extension_setting_slug does not exist");
+			
+		return $setting[0]->value;
+	}
+	
+	/**
+	 * Gets a setting for the site
+	 * 
+	 * @param $site_setting_slug
+	 * @return setting
+	 */
+	
+	protected function get_site_setting($site_setting_slug)
+	{
+		$setting = Extension::get_extension_settings(0, $site_setting_slug);
+		
+		if(count($setting) < 1)
+			throw new Exception_Extension("Site setting $site_setting_slug does not exist");
+			
+		return $setting[0]->value;
+	}
 
     /**
      * The first function to be executed before the controller is executed fully
@@ -1193,12 +1235,12 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_settings()
+    public function action_settings($extension_id = 0, $confirm = 0)
     {
     	$this->check_access_level_admin();
 		
         if($this->admin_settings_function) {
-            $this->admin_settings();
+            $this->admin_settings($extension_id, $confirm);
         }
         else {
             throw new HttpNotFoundException();

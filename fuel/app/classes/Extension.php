@@ -399,4 +399,72 @@ class Extension {
 
         return $theme_html;
     }
+
+	/**
+	 * Gets settings for the site or specific extension
+	 * 
+	 * @param $extension_id
+	 * @return settings
+	 */
+
+	public static function get_extension_settings($extension_id = 0, $setting_slug = "")
+	{
+		$extension_settings = null;
+		
+		if($extension_id > 0)
+		{
+			$extension_settings = DB::select(
+				array('extension_setting_id', 'id'),
+				array('extension_setting_name', 'name'),
+				array('extension_setting_slug', 'slug'),
+				array('extension_setting_value', 'value'))
+			->from(ExtensionSetup::EXTENSION_SETTINGS_TABLE)
+			->where('extension_setting_extension_id', "=", $extension_id);
+			
+			if($setting_slug != "")
+				$extension_settings = $extension_settings->where("extension_setting_slug", "=", $setting_slug);
+		}
+		else 
+		{
+			$extension_settings = DB::select(
+				array('setting_id', 'id'),
+				array('setting_name', 'name'),
+				array('setting_slug', 'slug'),
+				array('setting_value', 'value'))
+			->from(CMSInit::TABLE_SETTINGS);
+			
+			if($setting_slug != "")
+				$extension_settings = $extension_settings->where("setting_slug", "=", $setting_slug);
+		}
+		
+		
+		$extension_settings = $extension_settings->as_object()->execute();
+		
+		return $extension_settings;
+	}
+	
+	/**
+	 * Saves a specific setting value
+	 * 
+	 * @param $extension_id
+	 * @param $setting_id
+	 * @param $value
+	 * @return result
+	 */
+	
+	public static function save_extension_setting($extension_id, $setting_id, $value)
+	{	
+		if($extension_id > 0)
+		{
+			return $result = DB::update(ExtensionSetup::EXTENSION_SETTINGS_TABLE)->set(array("extension_setting_value" => $value))
+				->where("extension_setting_id", "=", $setting_id)
+				->execute();
+		}
+		else 
+		{
+			return $result = DB::update(CMSInit::TABLE_SETTINGS)->set(array("setting_value" => $value))
+				->where("setting_id", "=", $setting_id)
+				->execute();
+		}
+	}
 }
