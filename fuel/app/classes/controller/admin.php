@@ -1069,12 +1069,12 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_navigation()
+    public function action_navigation($confirm = 0)
     {
     	$this->check_access_level_content();
 		
         if($this->admin_navigation_function) {
-            $this->admin_navigation();
+            $this->admin_navigation($confirm);
         }
         else {
            throw new HttpNotFoundException();

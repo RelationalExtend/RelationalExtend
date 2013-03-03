@@ -14,6 +14,21 @@ class Controller_CMS extends \Controller_Admin {
     protected $default_admin_extension_path = "cms/cms/";
     
     protected $is_abstract_controller = false;
+	
+	/**
+	 * Gets all shortened URLs
+	 * 
+	 * @return array()
+	 */
+	
+	private function get_shortened_urls()
+	{
+		return array();
+	}
+	
+	/**
+	 * Controller initialization
+	 */
 
     public function before()
     {
@@ -248,6 +263,8 @@ class Controller_CMS extends \Controller_Admin {
 	
 	public function admin_settings($extension_id = 0, $confirm = 0)
 	{
+		$this->check_access_level_developer();
+		
 		$extensions = \Extension::get_installed_extensions(true);
 		$settings = \Extension::get_extension_settings($extension_id);
 		
@@ -285,6 +302,8 @@ class Controller_CMS extends \Controller_Admin {
 
 	public function action_savesettings($extension_id)
 	{
+		$this->check_access_level_developer();
+		
 		$extension_settings = \Extension::get_extension_settings($extension_id);
 		
 		foreach($extension_settings as $extension_setting)
@@ -299,5 +318,112 @@ class Controller_CMS extends \Controller_Admin {
 		}
 		
 		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."settings/$extension_id/1");
+	}
+	
+	/**
+	 * Handles the navigation
+	 * 
+	 * @param $confirm
+	 */
+	
+	public function admin_navigation($confirm)
+	{
+		$this->check_access_level_developer();
+		
+		$page_module_enabled = $this->is_extension_installed('page');
+		$extension_items = \Extension::get_installed_extensions();
+		$page_items = array();
+		$navigation_items = \Navigation::get_all_navigation_items($this->get_shortened_urls());
+		
+		if($page_module_enabled)
+		{
+			$page_items = \page\Page::get_pages();
+		}
+		
+		$this->build_admin_interface(
+			\Fuel\Core\View::forge("admin/navigation", 
+				array("page_items" => $page_items,
+					"extension_items" => $extension_items,
+					"controller_path" => $this->controller_path,
+					"navigation_items" => $navigation_items,
+					"confirm" => $confirm)
+			)
+		);
+	}
+	
+	/**
+	 * Add an item to the navigation
+	 */
+	
+	public function action_addnavigation()
+	{
+		$this->check_access_level_developer();
+		
+		$text = \Fuel\Core\Input::post('text', false);
+		$type = \Fuel\Core\Input::post('type', false);
+		$page_object_id = \Fuel\Core\Input::post('page_object_id', false);
+		$extension_object_id = \Fuel\Core\Input::post('extension_object_id', false);
+		$after_navigation_id = \Fuel\Core\Input::post('after_navigation_id', null);
+		
+		$object_id = $page_object_id;
+		
+		if($type == \Navigation::NAV_MODULE)
+			$object_id = $extension_object_id;
+		
+		if(($text != false) && ($type != false) && ($page_object_id != false) && ($extension_object_id != false)
+			&& ($after_navigation_id != null))
+		{
+			\Navigation::save_navigation($text, $type, $object_id, $after_navigation_id);
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation/1");
+		}
+		else 
+		{
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation");
+		}
+	}
+	
+	/**
+	 * Delete a navigation item
+	 * 
+	 * @param $navigation_id
+	 */
+	
+	public function action_deletenavigation($navigation_id)
+	{
+		$this->check_access_level_developer();
+		
+		\Navigation::remove_navigation($navigation_id);
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation/2");
+	}
+	
+	/**
+	 * Update a navigation item
+	 * 
+	 * @param $navigation_id
+	 */
+	
+	public function action_updatenavigation($navigation_id)
+	{
+		$this->check_access_level_developer();
+		
+		$text = \Fuel\Core\Input::post('text', false);
+		$type = \Fuel\Core\Input::post('type', false);
+		$page_object_id = \Fuel\Core\Input::post('page_object_id', false);
+		$extension_object_id = \Fuel\Core\Input::post('extension_object_id', false);
+		
+		$object_id = $page_object_id;
+		
+		if($type == \Navigation::NAV_MODULE)
+			$object_id = $extension_object_id;
+		
+		if(($text != false) && ($type != false) && ($page_object_id != false) && ($extension_object_id != false))
+		{
+			\Navigation::update_navigation($text, $type, $object_id, $navigation_id);
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation/1");
+		}
+		else 
+		{
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation");
+		}
 	}
 }
