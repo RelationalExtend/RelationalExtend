@@ -67,7 +67,9 @@
     <h2>Add a new navigation item</h2>
 	<hr/>
 	
-	<form action="<?php echo(Uri::base().$controller_path."addnavigation"); ?>"
+	<!-- After -->
+	
+	<form action="<?php echo(Uri::base().$controller_path."addnavigationafter"); ?>"
 		method="post" class="form-inline">
 		<input type="text" name="text" placeholder="Navigation text..." style="width:15%;"/>
 		<span style="padding:15px;">
@@ -98,6 +100,52 @@
 		</span>
 		<span>After&nbsp;</span>
 		<select name="after_navigation_id" style="width:15%;">
+			<option value="0">--New item--</option>
+<?php
+	foreach($navigation_items as $navigation_item) {
+?>
+			<option value="<?php echo($navigation_item->{Navigation::NAV_ITEM_ID}); ?>"><?php echo($navigation_item->{Navigation::NAV_ITEM_TEXT}); ?></option>
+<?php
+	}
+?>
+	
+		</select>	
+		<input type="submit" class="btn" value="Add" style="margin-left:10px;"/>
+	</form>
+	
+	<!-- Before -->
+	
+	<form action="<?php echo(Uri::base().$controller_path."addnavigationbefore"); ?>"
+		method="post" class="form-inline">
+		<input type="text" name="text" placeholder="Navigation text..." style="width:15%;"/>
+		<span style="padding:15px;">
+			<span><input type="radio" name="type" value="<?php echo(Navigation::NAV_PAGE); ?>" checked />&nbsp;Page&nbsp;</span>
+			<select name="page_object_id" style="width:15%;">
+<?php
+	foreach($page_items as $page_item)
+	{
+?>
+				<option value="<?php echo($page_item["id"]); ?>"><?php echo($page_item["page_title"]); ?></option>
+<?php
+	}
+?>                			
+			</select>
+		</span>
+		<span style="padding:15px;">
+			<span><input type="radio" name="type" value="<?php echo(Navigation::NAV_MODULE); ?>">&nbsp;Extension&nbsp;</span>
+			<select name="extension_object_id" style="width:15%;">
+<?php
+	foreach($extension_items as $extension_item)
+	{
+?>
+				<option value="<?php echo($extension_item->extension_id); ?>"><?php echo($extension_item->extension_name); ?></option>
+<?php
+	}
+?>                			
+			</select>
+		</span>
+		<span>Before&nbsp;</span>
+		<select name="before_navigation_id" style="width:15%;">
 			<option value="0">--New item--</option>
 <?php
 	foreach($navigation_items as $navigation_item) {

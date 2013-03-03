@@ -174,14 +174,15 @@ class Navigation {
 	 * @param $after_navigation_id = 0
 	 */
 	
-	public static function save_navigation($navigation_text, $navigation_type, $object_id, $after_navigation_id = 0)
+	public static function save_navigation($navigation_text, $navigation_type, $object_id, $after_navigation_id = 0,
+		$before_navigation_id = 0)
 	{
 		$navigation_order = 0;
 		
 		if(($navigation_type != self::NAV_MODULE) && ($navigation_type != self::NAV_PAGE))
 			throw new Exception_Navigation("Invalid navigation type supplied");
 		
-		if($after_navigation_id == 0)
+		if($after_navigation_id == 0 && $before_navigation_id == 0)
 		{
 			$nav_record = DB::select(DB::expr('MAX(navigation_order) AS nav_order'))->from(self::TABLE_NAVIGATION)
 				->as_object()->execute();
@@ -189,7 +190,7 @@ class Navigation {
 			
 			self::create_navigation_item($navigation_text, $navigation_type, $object_id,($navigation_order + 1));
 		}
-		else 
+		else if($after_navigation_id > 0)
 		{
 			$nav_record = self::get_navigation_item($after_navigation_id);
 			
@@ -204,6 +205,22 @@ class Navigation {
 			$num_rows = DB::query($update_order_query)->execute();
 			
 			self::create_navigation_item($navigation_text, $navigation_type, $object_id, ($navigation_order + 1));
+		}
+		else if($before_navigation_id > 0)
+		{
+			$nav_record = self::get_navigation_item($before_navigation_id);
+			
+			if(count($nav_record) < 1)
+				throw new Exception_Navigation("Navigation record does not exist");
+			
+			$navigation_order = intval($nav_record[0]->navigation_order);			
+			
+			$update_order_query = "UPDATE ".DB::table_prefix(self::TABLE_NAVIGATION)." SET navigation_order = (navigation_order + 1) ";
+			$update_order_query.= "WHERE navigation_order >= $navigation_order";
+			
+			$num_rows = DB::query($update_order_query)->execute();
+			
+			self::create_navigation_item($navigation_text, $navigation_type, $object_id, ($navigation_order));
 		}
 	}
 	

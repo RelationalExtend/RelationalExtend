@@ -355,7 +355,7 @@ class Controller_CMS extends \Controller_Admin {
 	 * Add an item to the navigation
 	 */
 	
-	public function action_addnavigation()
+	public function action_addnavigationafter()
 	{
 		$this->check_access_level_developer();
 		
@@ -374,6 +374,37 @@ class Controller_CMS extends \Controller_Admin {
 			&& ($after_navigation_id != null))
 		{
 			\Navigation::save_navigation($text, $type, $object_id, $after_navigation_id);
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation/1");
+		}
+		else 
+		{
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation");
+		}
+	}
+	
+	/**
+	 * Add an item to the navigation
+	 */
+	
+	public function action_addnavigationbefore()
+	{
+		$this->check_access_level_developer();
+		
+		$text = \Fuel\Core\Input::post('text', false);
+		$type = \Fuel\Core\Input::post('type', false);
+		$page_object_id = \Fuel\Core\Input::post('page_object_id', false);
+		$extension_object_id = \Fuel\Core\Input::post('extension_object_id', false);
+		$before_navigation_id = \Fuel\Core\Input::post('before_navigation_id', null);
+		
+		$object_id = $page_object_id;
+		
+		if($type == \Navigation::NAV_MODULE)
+			$object_id = $extension_object_id;
+		
+		if(($text != false) && ($type != false) && ($page_object_id != false) && ($extension_object_id != false)
+			&& ($before_navigation_id != null))
+		{
+			\Navigation::save_navigation($text, $type, $object_id, 0, $before_navigation_id);
 			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."navigation/1");
 		}
 		else 
