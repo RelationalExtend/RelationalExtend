@@ -189,6 +189,7 @@ CREATE TABLE IF NOT EXISTS `theme_styles` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
 ------------------------------------------------------------------------------
+
 --
 -- Table structure for table `users`
 --
@@ -206,3 +207,22 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`,`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `navigation`
+--
+
+CREATE TABLE IF NOT EXISTS `navigation` (
+  `navigation_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `navigation_text` varchar(200) NOT NULL,
+  `navigation_type` enum('page','module') NOT NULL,
+  `navigation_object_id` bigint(20) NOT NULL,
+  `navigation_order` bigint(20) NOT NULL,
+  PRIMARY KEY (`navigation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
