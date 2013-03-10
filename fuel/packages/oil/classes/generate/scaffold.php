@@ -3,10 +3,10 @@
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
  * @package    Fuel
- * @version    1.0
+ * @version    1.5
  * @author     Fuel Development Team
  * @license    MIT License
- * @copyright  2010 - 2011 Fuel Development Team
+ * @copyright  2010 - 2013 Fuel Development Team
  * @link       http://fuelphp.com
  */
 
@@ -115,13 +115,13 @@ class Generate_Scaffold
 		{
 			if (\Cli::option('mysql-timestamp', false))
 			{
-				$migration_args[] = 'created_at:date';
-				$migration_args[] = 'updated_at:date';
+				$migration_args[] = 'created_at:date:null[1]';
+				$migration_args[] = 'updated_at:date:null[1]';
 			}
 			else
 			{
-				$migration_args[] = 'created_at:int';
-				$migration_args[] = 'updated_at:int';
+				$migration_args[] = 'created_at:int:null[1]';
+				$migration_args[] = 'updated_at:int:null[1]';
 			}
 		}
 		array_unshift($migration_args, 'create_'.\Inflector::pluralize(\Str::lower($name)));

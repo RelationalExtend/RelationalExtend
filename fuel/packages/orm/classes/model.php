@@ -2,12 +2,12 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package		Fuel
- * @version		1.0
- * @author		Fuel Development Team
- * @license		MIT License
- * @copyright	2010 - 2012 Fuel Development Team
- * @link		http://fuelphp.com
+ * @package    Fuel
+ * @version    1.5
+ * @author     Fuel Development Team
+ * @license    MIT License
+ * @copyright  2010 - 2013 Fuel Development Team
+ * @link       http://fuelphp.com
  */
 
 namespace Orm;
@@ -32,6 +32,11 @@ class Model implements \ArrayAccess, \Iterator
 	 * @var  string  connection to use
 	 */
 	// protected static $_connection = null;
+
+	/**
+	 * @var  string  write connection to use
+	 */
+	// protected static $_write_connection = null;
 
 	/**
 	 * @var  string  table name to overwrite assumption
@@ -120,11 +125,17 @@ class Model implements \ArrayAccess, \Iterator
 	/**
 	 * Fetch the database connection name to use
 	 *
+	 * @param	bool	if true return the writeable connection (if set)
 	 * @return  null|string
 	 */
-	public static function connection()
+	public static function connection($writeable = false)
 	{
 		$class = get_called_class();
+
+		if ($writeable and property_exists($class, '_write_connection'))
+		{
+			return static::$_write_connection;
+		}
 
 		return property_exists($class, '_connection') ? static::$_connection : null;
 	}
@@ -483,6 +494,10 @@ class Model implements \ArrayAccess, \Iterator
 		// Return Query object
 		if (is_null($id))
 		{
+			if (func_num_args() === 1)
+			{
+				throw new \FuelException('Invalid method call.  You need to specify a key value.', 0);
+			}
 			return static::query($options);
 		}
 		// Return all that match $options array
@@ -534,7 +549,7 @@ class Model implements \ArrayAccess, \Iterator
 	 */
 	public static function query($options = array())
 	{
-		return Query::forge(get_called_class(), static::connection(), $options);
+		return Query::forge(get_called_class(), array(static::connection(), static::connection(true)), $options);
 	}
 
 	/**
@@ -545,7 +560,7 @@ class Model implements \ArrayAccess, \Iterator
 	 */
 	public static function count(array $options = array())
 	{
-		return Query::forge(get_called_class(), static::connection(), $options)->count();
+		return Query::forge(get_called_class(), array(static::connection(), static::connection(true)), $options)->count();
 	}
 
 	/**
@@ -557,7 +572,7 @@ class Model implements \ArrayAccess, \Iterator
 	 */
 	public static function max($key = null)
 	{
-		return Query::forge(get_called_class(), static::connection())->max($key ?: static::primary_key());
+		return Query::forge(get_called_class(), array(static::connection(), static::connection(true)))->max($key ?: static::primary_key());
 	}
 
 	/**
@@ -569,7 +584,7 @@ class Model implements \ArrayAccess, \Iterator
 	 */
 	public static function min($key = null)
 	{
-		return Query::forge(get_called_class(), static::connection())->min($key ?: static::primary_key());
+		return Query::forge(get_called_class(), array(static::connection(), static::connection(true)))->min($key ?: static::primary_key());
 	}
 
 	public static function __callStatic($method, $args)
@@ -990,7 +1005,7 @@ class Model implements \ArrayAccess, \Iterator
 			}
 			return $this->_data_relations[$property];
 		}
-		elseif ($value = $this->_get_eav($property))
+		elseif (($value = $this->_get_eav($property)) !== false)
 		{
 			return $value;
 		}
@@ -1043,7 +1058,7 @@ class Model implements \ArrayAccess, \Iterator
 
 			if (in_array($property, static::primary_key()) and $this->{$property} !== null)
 			{
-				throw new \FuelException('Primary key cannot be changed.');
+				throw new \FuelException('Primary key on model '.get_class().' cannot be changed.');
 			}
 			if (array_key_exists($property, static::properties()))
 			{
@@ -1080,7 +1095,7 @@ class Model implements \ArrayAccess, \Iterator
 
 		if ($use_transaction)
 		{
-			$db = \Database_Connection::instance(static::connection());
+			$db = \Database_Connection::instance(static::connection(true));
 			$db->start_transaction();
 		}
 
@@ -1151,7 +1166,7 @@ class Model implements \ArrayAccess, \Iterator
 		$this->observe('before_insert');
 
 		// Set all current values
-		$query = Query::forge(get_called_class(), static::connection());
+		$query = Query::forge(get_called_class(), static::connection(true));
 		$primary_key = static::primary_key();
 		$properties  = array_keys(static::properties());
 		foreach ($properties as $p)
@@ -1202,7 +1217,7 @@ class Model implements \ArrayAccess, \Iterator
 		$this->observe('before_update');
 
 		// Create the query and limit to primary key(s)
-		$query       = Query::forge(get_called_class(), static::connection());
+		$query       = Query::forge(get_called_class(), static::connection(true));
 		$primary_key = static::primary_key();
 		$properties  = array_keys(static::properties());
 		foreach ($primary_key as $pk)
@@ -1223,10 +1238,6 @@ class Model implements \ArrayAccess, \Iterator
 				{
 					array_key_exists($p, $this->_data) and $query->set($p, $this->_data[$p]);
 				}
-			}
-
-			if ( ! in_array($p, $primary_key) and (array_key_exists($p, $this->_data) or array_key_exists($p, $this->_original)))
-			{
 			}
 		}
 
@@ -1261,7 +1272,7 @@ class Model implements \ArrayAccess, \Iterator
 
 		if ($use_transaction)
 		{
-			$db = \Database_Connection::instance(static::connection());
+			$db = \Database_Connection::instance(static::connection(true));
 			$db->start_transaction();
 		}
 
@@ -1277,7 +1288,7 @@ class Model implements \ArrayAccess, \Iterator
 			$this->unfreeze();
 
 			// Create the query and limit to primary key(s)
-			$query = Query::forge(get_called_class(), static::connection())->limit(1);
+			$query = Query::forge(get_called_class(), static::connection(true))->limit(1);
 			$primary_key = static::primary_key();
 			foreach ($primary_key as $pk)
 			{
@@ -1576,7 +1587,7 @@ class Model implements \ArrayAccess, \Iterator
 
 
 	/**
-	 * Allow populating this object from an array
+	 * Allow populating this object from an array, and any related objects
 	 *
 	 * @return  array
 	 */
@@ -1587,6 +1598,19 @@ class Model implements \ArrayAccess, \Iterator
 			if (array_key_exists($property, static::properties()) and ! in_array($property, static::primary_key()))
 			{
 				$this->_data[$property] = $value;
+			}
+			elseif (array_key_exists($property, static::relations()) and is_array($value))
+			{
+				foreach($value as $id => $data)
+				{
+					if (array_key_exists($id, $this->_data_relations[$property]) and is_array($data))
+					{
+						foreach($data as $field => $contents)
+						{
+							$this->_data_relations[$property][$id]->{$field} = $contents;
+						}
+					}
+				}
 			}
 		}
 	}

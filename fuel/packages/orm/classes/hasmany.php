@@ -2,12 +2,12 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package		Fuel
- * @version		1.0
- * @author		Fuel Development Team
- * @license		MIT License
- * @copyright	2010 - 2012 Fuel Development Team
- * @link		http://fuelphp.com
+ * @package    Fuel
+ * @version    1.5
+ * @author     Fuel Development Team
+ * @license    MIT License
+ * @copyright  2010 - 2013 Fuel Development Team
+ * @link       http://fuelphp.com
  */
 
 namespace Orm;
@@ -41,10 +41,15 @@ class HasMany extends Relation
 
 	public function get(Model $from)
 	{
-		$query = call_user_func(array($this->model_to, 'find'));
+		$query = call_user_func(array($this->model_to, 'query'));
 		reset($this->key_to);
 		foreach ($this->key_from as $key)
 		{
+			// no point running a query when a key value is null
+			if ($from->{$key} === null)
+			{
+				return array();
+			}
 			$query->where(current($this->key_to), $from->{$key});
 			next($this->key_to);
 		}

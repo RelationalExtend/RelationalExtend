@@ -3,10 +3,10 @@
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
  * @package    Fuel
- * @version    1.0
+ * @version    1.5
  * @author     Fuel Development Team
  * @license    MIT License
- * @copyright  2010 - 2011 Fuel Development Team
+ * @copyright  2010 - 2013 Fuel Development Team
  * @link       http://fuelphp.com
  */
 
@@ -147,7 +147,7 @@ CONF;
 		$filepath = APPPATH.'classes'.DS.'controller'.DS.$filename.'.php';
 
 		// Uppercase each part of the class name and remove hyphens
-		$class_name = \Inflector::classify($name, false);
+		$class_name = \Inflector::classify(str_replace(array('\\', '/'), '_', $name), false);
 
 		// Stick "blog" to the start of the array
 		array_unshift($args, $filename);
@@ -239,10 +239,10 @@ VIEWMODEL;
 
 		$filename = trim(str_replace(array('_', '-'), DS, $singular), DS);
 
-		$filepath = APPPATH . 'classes/model/'.$filename.'.php';
+		$filepath = APPPATH.'classes'.DS.'model'.DS.$filename.'.php';
 
 		// Uppercase each part of the class name and remove hyphens
-		$class_name = \Inflector::classify($singular, false);
+		$class_name = \Inflector::classify(str_replace(array('\\', '/'), '_', $singular), false);
 
 		// Turn foo:string into "id", "foo",
 		$properties = implode(",\n\t\t", array_map(function($field) {
@@ -256,24 +256,22 @@ VIEWMODEL;
 		}, $args));
 
 		// Make sure an id is present
-		strpos($properties, "'id'") === false and $properties = "'id',\n\t\t".$properties;
+		strpos($properties, "'id'") === false and $properties = "'id',\n\t\t".$properties.',';
 
-		if ( ! \Cli::option('no-properties'))
+		$contents = '';
+
+		if (\Cli::option('crud'))
 		{
-			$contents = <<<CONTENTS
+			if ( ! \Cli::option('no-properties'))
+			{
+				$contents = <<<CONTENTS
 	protected static \$_properties = array(
 		{$properties}
 	);
 
 CONTENTS;
-		}
-		else
-		{
-			$contents = '';
-		}
+			}
 
-		if (\Cli::option('crud'))
-		{
 			if($created_at = \Cli::option('created-at'))
 			{
 				is_string($created_at) or $created_at = 'created_at';
@@ -326,13 +324,26 @@ MODEL;
 			{
 				$created_at = \Cli::option('created-at', 'created_at');
 				is_string($created_at) or $created_at = 'created_at';
+				$properties .= "\n\t\t'".$created_at."',";
+
 				$updated_at = \Cli::option('updated-at', 'updated_at');
 				is_string($updated_at) or $updated_at = 'updated_at';
+				$properties .= "\n\t\t'".$updated_at."',";
 
 				$time_type = (\Cli::option('mysql-timestamp')) ? 'timestamp' : 'int';
 
-				$timestamp_properties = array($created_at.':'.$time_type, $updated_at.':'.$time_type);
+				$timestamp_properties = array($created_at.':'.$time_type.':null[1]', $updated_at.':'.$time_type.':null[1]');
 				$args = array_merge($args, $timestamp_properties);
+			}
+
+			if ( ! \Cli::option('no-properties'))
+			{
+				$contents = <<<CONTENTS
+	protected static \$_properties = array(
+		{$properties}
+	);
+
+CONTENTS;
 			}
 
 			if ( ! \Cli::option('no-timestamp'))
@@ -662,6 +673,16 @@ VIEW;
 								{
 									$option = true;
 								}
+							}
+
+							// deal with some special cases
+							switch ($option_name)
+							{
+								case 'auto_increment':
+								case 'null':
+								case 'unsigned':
+									$option = (bool) $option;
+									break;
 							}
 
 							$field_array[$option_name] = $option;

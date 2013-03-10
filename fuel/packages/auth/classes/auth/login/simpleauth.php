@@ -3,10 +3,10 @@
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
  * @package    Fuel
- * @version    1.0
+ * @version    1.5
  * @author     Fuel Development Team
  * @license    MIT License
- * @copyright  2010 - 2011 Fuel Development Team
+ * @copyright  2010 - 2013 Fuel Development Team
  * @link       http://fuelphp.com
  */
 
@@ -135,6 +135,9 @@ class Auth_Login_SimpleAuth extends \Auth_Login_Driver
 			\Session::delete('login_hash');
 			return false;
 		}
+
+		// register so Auth::logout() can find us
+		Auth::_register_verified($this);
 
 		\Session::set('username', $this->user['username']);
 		\Session::set('login_hash', $this->create_login_hash());

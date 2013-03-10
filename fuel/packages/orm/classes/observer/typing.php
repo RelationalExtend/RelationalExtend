@@ -2,19 +2,26 @@
 /**
  * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package		Fuel
- * @version		1.0
- * @author		Fuel Development Team
- * @license		MIT License
- * @copyright	2010 - 2012 Fuel Development Team
- * @link		http://fuelphp.com
+ * @package    Fuel
+ * @version    1.5
+ * @author     Fuel Development Team
+ * @license    MIT License
+ * @copyright  2010 - 2013 Fuel Development Team
+ * @link       http://fuelphp.com
  */
 
 namespace Orm;
 
-// Invalid content exception, thrown when conversion is not possible
+/**
+ * Invalid content exception, thrown when type conversion is not possible.
+ */
 class InvalidContentType extends \UnexpectedValueException {}
 
+/**
+ * Typing observer.
+ *
+ * Runs on load or save, and ensures the correct data type of your ORM object properties.
+ */
 class Observer_Typing
 {
 	/**
@@ -126,7 +133,11 @@ class Observer_Typing
 	 *
 	 * @param  string  $column	name of the column
 	 * @param  string  $value	value
-	 * @param  string  $type	column settings from the model
+	 * @param  string  $settings	column settings from the model
+	 *
+	 * @throws  InvalidContentType
+	 *
+	 * @return  mixed
 	 */
 	public static function typecast($column, $value, $settings)
 	{
@@ -167,9 +178,11 @@ class Observer_Typing
 	/**
 	 * Casts to string when necessary and checks if within max length
 	 *
+	 * @param   mixed  value to typecast
+	 * @param   array  any options to be passed
+	 *
 	 * @throws  InvalidContentType
-	 * @param   mixed  value
-	 * @param   array
+	 *
 	 * @return  string
 	 */
 	public static function type_string($var, array $settings)
@@ -196,9 +209,11 @@ class Observer_Typing
 	/**
 	 * Casts to int when necessary and checks if within max values
 	 *
+	 * @param   mixed  value to typecast
+	 * @param   array  any options to be passed
+	 *
 	 * @throws  InvalidContentType
-	 * @param   mixed  value
-	 * @param   array
+	 *
 	 * @return  int
 	 */
 	public static function type_integer($var, array $settings)
@@ -220,9 +235,10 @@ class Observer_Typing
 	/**
 	 * Casts to float when necessary
 	 *
+	 * @param   mixed  value to typecast
+	 *
 	 * @throws  InvalidContentType
-	 * @param   mixed  value
-	 * @param   array
+	 *
 	 * @return  float
 	 */
 	public static function type_float($var)
@@ -236,11 +252,13 @@ class Observer_Typing
 	}
 
 	/**
-	 * Casts to string when necessary and checks if it's a valid value
+	 * Value pre-treater, deals with array values, and handles the enum type
+	 *
+	 * @param   mixed  value
+	 * @param   array  any options to be passed
 	 *
 	 * @throws  InvalidContentType
-	 * @param   mixed  value
-	 * @param   array
+	 *
 	 * @return  string
 	 */
 	public static function type_set_before($var, array $settings)
@@ -266,9 +284,10 @@ class Observer_Typing
 	}
 
 	/**
-	 * Casts to string when necessary and checks if it's a valid value
+	 * Value post-treater, converts a comma-delimited string into an array
 	 *
-	 * @param   string  value
+	 * @param   mixed  value
+	 *
 	 * @return  array
 	 */
 	public static function type_set_after($var)
@@ -280,7 +299,7 @@ class Observer_Typing
 	 * Converts boolean input to 1 or 0 for the DB
 	 *
 	 * @param   bool  value
-	 * @param   array
+	 *
 	 * @return  int
 	 */
 	public static function type_bool_to_int($var)
@@ -292,7 +311,7 @@ class Observer_Typing
 	 * Converts DB bool values to PHP bool value
 	 *
 	 * @param   bool  value
-	 * @param   array
+	 *
 	 * @return  int
 	 */
 	public static function type_bool_from_int($var)
@@ -303,9 +322,11 @@ class Observer_Typing
 	/**
 	 * Returns the serialized input
 	 *
-	 * @throws  InvalidContentType
 	 * @param   mixed  value
-	 * @param   array
+	 * @param   array  any options to be passed
+	 *
+	 * @throws  InvalidContentType
+	 *
 	 * @return  string
 	 */
 	public static function type_serialize($var, array $settings)
@@ -327,7 +348,8 @@ class Observer_Typing
 	/**
 	 * Unserializes the input
 	 *
-	 * @param   string
+	 * @param   string  value
+	 *
 	 * @return  mixed
 	 */
 	public static function type_unserialize($var)
@@ -338,9 +360,11 @@ class Observer_Typing
 	/**
 	 * JSON encodes the input
 	 *
-	 * @throws  InvalidContentType
 	 * @param   mixed  value
-	 * @param   array
+	 * @param   array  any options to be passed
+	 *
+	 * @throws  InvalidContentType
+	 *
 	 * @return  string
 	 */
 	public static function type_json_encode($var, array $settings)
@@ -362,7 +386,8 @@ class Observer_Typing
 	/**
 	 * Decodes the JSON
 	 *
-	 * @param   string
+	 * @param   string  value
+	 *
 	 * @return  mixed
 	 */
 	public static function type_json_decode($var, $settings)
@@ -378,10 +403,12 @@ class Observer_Typing
 	/**
 	 * Takes a Date instance and transforms it into a DB timestamp
 	 *
-	 * @param   \Fuel\Core\Date  $var
-	 * @param   array            $settings
-	 * @return  int|string
+	 * @param   \Fuel\Core\Date  value
+	 * @param   array  any options to be passed
+	 *
 	 * @throws  InvalidContentType
+	 *
+	 * @return  int|string
 	 */
 	public static function type_time_encode(\Fuel\Core\Date $var, array $settings)
 	{
@@ -401,8 +428,9 @@ class Observer_Typing
 	/**
 	 * Takes a DB timestamp and converts it into a Date object
 	 *
-	 * @param   string  $var
-	 * @param   array   $settings
+	 * @param   string  value
+	 * @param   array  any options to be passed
+	 *
 	 * @return  \Fuel\Core\Date
 	 */
 	public static function type_time_decode($var, array $settings)
