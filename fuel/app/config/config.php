@@ -22,8 +22,9 @@ return array(
         THEMEPATH,
     ),
     'always_load' => array(
-        'modules' => array(
-            'cms'
+    	'modules' => array(
+            'cms',
+            'customcontrols',
         ),
         'packages' => array(
             "auth"

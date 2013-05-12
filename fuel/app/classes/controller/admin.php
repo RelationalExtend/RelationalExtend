@@ -51,6 +51,8 @@ class Controller_Admin extends Controller_Template {
     protected $action_path = null;
     protected $default_admin_extension_path = "admin/";
     protected $logout_path = "cms/cms/logout";
+	
+	protected $msh_site = false;
 
     // Admin layout
 
@@ -252,23 +254,30 @@ class Controller_Admin extends Controller_Template {
         $links = array(
             self::MENU_DASHBOARD => $this->build_menu_item("Dashboard", $this->default_admin_extension_path.self::MENU_DASHBOARD),
             self::MENU_CONTENT => $this->build_active_extensions_menu(),
-            self::MENU_THEMES => $this->build_menu_item("Themes", $this->default_admin_extension_path.self::MENU_THEMES),
-            self::MENU_EXTENSIONS => $this->build_menu_item("Extensions", $this->default_admin_extension_path.self::MENU_EXTENSIONS),
-         
-      );
+      	);
+		
+		if(!$this->msh_site)
+		{
+			// Themes and extensions	
+				
+			$links[self::MENU_THEMES] = $this->build_menu_item("Themes", $this->default_admin_extension_path.self::MENU_THEMES);
+			$links[self::MENU_EXTENSIONS] = $this->build_menu_item("Extensions", $this->default_admin_extension_path.self::MENU_EXTENSIONS);
+			
+			// Navigation
+			
+			if($this->admin_navigation_function)
+            	$links[self::MENU_NAVIGATION] = $this->build_menu_item("Navigation", $this->default_admin_extension_path.self::MENU_NAVIGATION);
+		}
 
-         if($this->admin_settings_function)
+     	if($this->admin_settings_function)
             $links[self::MENU_SETTINGS] = $this->build_menu_item("Settings", $this->default_admin_extension_path.self::MENU_SETTINGS);
 
-        if($this->admin_navigation_function)
-            $links[self::MENU_NAVIGATION] = $this->build_menu_item("Navigation", $this->default_admin_extension_path.self::MENU_NAVIGATION);
-
-         if($this->admin_users_function){
+     	if($this->admin_users_function){
             $links[self::MENU_USERS] = $this->build_menu_item("Users", $this->default_admin_extension_path.self::MENU_USERS);
-            if(Auth::check()){
-            $links[self::MENU_LOGOUT] = $this->build_menu_item("Logout", $this->logout_path);
-            }
             
+            if(Auth::check()){
+            	$links[self::MENU_LOGOUT] = $this->build_menu_item("Logout", $this->logout_path);
+            }
          }
         return $links;
     }
@@ -746,6 +755,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_themes()
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         $core_themes = CMSTheme::get_public_themes();
@@ -811,6 +825,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_installtheme($theme_folder, $activate = 0)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         if(!Module::loaded($theme_folder)) {
@@ -837,6 +856,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_uninstalltheme($theme_id, $confirm = 0)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
     	$url_from = $this->get_referring_url();
@@ -870,6 +894,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_activatetheme($theme_id)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         CMSTheme::set_default_theme($theme_id);
@@ -887,6 +916,11 @@ class Controller_Admin extends Controller_Template {
 	
 	public function action_managetheme($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0, $confirm = 0)
 	{
+		if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
 		$this->check_access_level_developer();
 					
 		if(intval($theme_id) < 1)
@@ -1035,6 +1069,11 @@ class Controller_Admin extends Controller_Template {
 
 	public function action_savethemecomponent($theme_id, $theme_component = CMSTheme::LAYOUT_PREFIX, $component_id = 0)
 	{
+		if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
 		$this->check_access_level_developer();
 		
 		$content = Input::post("code", false);
@@ -1071,6 +1110,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_navigation($confirm = 0)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_content();
 		
         if($this->admin_navigation_function) {
@@ -1089,6 +1133,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_extensions()
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         $core_extensions = Extension::get_core_extensions();
@@ -1153,6 +1202,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_installextension($extension_folder)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         if(!Module::loaded($extension_folder)) {
@@ -1173,6 +1227,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_uninstallextension($extension_id, $confirm = 0)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         $url_from = $this->get_referring_url();
@@ -1206,6 +1265,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_activateextension($extension_id)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         Extension::activate_extension($extension_id);
@@ -1222,6 +1286,11 @@ class Controller_Admin extends Controller_Template {
 
     public function action_deactivateextension($extension_id)
     {
+    	if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
     	$this->check_access_level_developer();
 		
         Extension::deactivate_extension($extension_id);

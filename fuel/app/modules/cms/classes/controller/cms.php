@@ -32,8 +32,28 @@ class Controller_CMS extends \Controller_Admin {
 
     public function before()
     {
+    	\Config::load("cms::msh", "msh");
+    	$this->msh_site = \Config::get("msh.msh_status");
+        	
         parent::before();
     }
+	
+	public function action_index()
+	{
+		if($this->msh_site)
+		{
+			// Custom code
+			$this->check_access_level_content();
+			$this->build_admin_interface(
+            	\Fuel\Core\View::forge("admin/msh-dashboard")
+	        );
+		}
+		else 
+		{
+			// Default code
+			parent::action_index();
+		}
+	}
 	
 	// Default auth functionality
 	
@@ -328,6 +348,11 @@ class Controller_CMS extends \Controller_Admin {
 	
 	public function admin_navigation($confirm)
 	{
+		if($this->msh_site)
+		{
+			throw new HttpNotFoundException();
+		}
+		
 		$this->check_access_level_developer();
 		
 		$page_module_enabled = $this->is_extension_installed('page');

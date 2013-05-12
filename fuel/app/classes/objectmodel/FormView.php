@@ -142,6 +142,11 @@ class ObjectModel_FormView {
                     }
 
                     break;
+				case DBFieldMeta::CONTROL_CUSTOM:
+					$custom_control = new \CustomControls\CustomControls();
+					$custom_control->set_meta_data($object, $object_meta_data, $controller);
+					$value_to_set = $custom_control->control_value();
+					break;
             }
 
             if(!$skip_control)

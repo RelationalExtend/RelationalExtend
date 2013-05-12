@@ -33,6 +33,7 @@ class DBFieldMeta {
     const CONTROL_CHECKBOX = "checkbox";
 	const CONTROL_MULTISELECT = "multiselect";
     const CONTROL_FILE = "file";
+	const CONTROL_CUSTOM = "custom";
 
     public $field_name;
     public $field_slug;

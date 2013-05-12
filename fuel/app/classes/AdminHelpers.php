@@ -301,6 +301,10 @@ class AdminHelpers {
             case DBFieldMeta::CONTROL_FILE:
                 $return_string = "<input type='file' name='$control_name' />";
                 break;
+			case DBFieldMeta::CONTROL_CUSTOM:
+				$custom_control = new \CustomControls\CustomControls($control_name, $control_meta_values);
+				$return_string = $custom_control->render_control();
+				break;
         }
 
         return $return_string == null? "" : "<p>$return_string</p>";
