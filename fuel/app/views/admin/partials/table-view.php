@@ -7,14 +7,24 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width: 60%;">Rows</th>
-                <th>&nbsp;</th>
+                <?php if(isset($table_rows[0]->description_field)) { ?>
+                	<th style="width: 60%;">Rows</th>
+            	<?php } ?>
+            	<?php foreach($additional_fields as $additional_field_key => $additinal_field_value) { ?>
+            		<th><?php echo($additional_field_value); ?></th>
+        		<?php } ?>
+        		<th>Actions</th>
             </tr>
         </thead>
         <tbody>
 <?php foreach($table_rows as $table_row) { ?>
             <tr>
-                <td><?php echo($table_row->description_field); ?></td>
+                <?php if(isset($table_row->description_field)) { ?>
+            		<td><?php echo($table_row->description_field); ?></td>
+        		<?php } ?>                
+                <?php foreach($additional_fields as $additional_field_key => $additinal_field_value) { ?>
+            		<th><?php echo($table_row->$additional_field_value); ?></th>
+        		<?php } ?>
                 <td><?php echo(AdminHelpers::bootstrap_buttons($table_row->buttons)); ?></td>
             </tr>
 <?php } ?>

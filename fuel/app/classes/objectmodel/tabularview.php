@@ -36,6 +36,7 @@ class ObjectModel_TabularView {
     private $id_field;
     private $thumbnail_field;
     private $description_field;
+	private $additional_fields = array();
 
     private $records;
     private $sort_field = "";
@@ -58,23 +59,33 @@ class ObjectModel_TabularView {
      *
      */
 
-    public function __construct($controller_path, $table_name, $id_field, $description_field, $thumbnail_field = null)
+    public function __construct($controller_path, $table_name, $id_field, $description_field, $thumbnail_field = null,
+		$additional_fields = array())
     {
         $this->controller_path = $controller_path;
         $this->table_name = $table_name;
         $this->id_field = $id_field;
         $this->description_field = $description_field;
         $this->thumbnail_field = $thumbnail_field;
+		
+		if(!is_array($additional_fields))
+			throw new Exception_CMS("The parameter additional_fields must be an array");
+		
+		$this->additional_fields = $additional_fields;
+		
+		$fields_to_include = array();
+		$fields_to_include[] = array($id_field, 'id_field');
+		
+		if($description_field != null)
+			$fields_to_include[] = array($description_field, 'description_field');
+		
+		if($thumbnail_field != null)
+			$fields_to_include[] = array($thumbnail_field_field, 'thumbnail_field');
+		
+		foreach($additional_fields as $additional_field_key => $additional_field_value)
+			$fields_to_include[] = array($additional_field_key, $additional_field_value);
 
-        if($thumbnail_field != null)
-        {
-            $this->records = DB::select(array($id_field, 'id_field'), array($description_field, 'description_field'),
-                array($thumbnail_field, 'thumbnail_field'))->from($table_name);
-        }
-        else {
-            $this->records = DB::select(array($id_field, 'id_field'), array($description_field, 'description_field'))
-                ->from($table_name);
-        }
+		$this->records = DB::select_array($fields_to_include)->from($table_name);
     }
 
     /**
@@ -224,4 +235,15 @@ class ObjectModel_TabularView {
     {
         return $this->bottom_buttons;
     }
+	
+	/**
+	 * Returns the additional fields in the tablular view
+	 * 
+	 * @return array
+	 */
+	
+	public function get_additional_fields()
+	{
+		return $this->additional_fields;
+	}
 }
