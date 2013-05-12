@@ -166,6 +166,22 @@ class Navigation {
 	}
 
 	/**
+	 * Gets the landing page slug
+	 * 
+	 * @return page_id
+	 */
+
+	public static function get_landing_page()
+	{
+		$navigation_records = DB::select("*")->from(self::TABLE_NAVIGATION)->order_by('navigation_order', 'asc')
+			->where("navigation_type", "=", self::NAV_PAGE)
+			->limit(1)
+			->as_object()->execute();
+			
+		return $navigation_records[0]->navigation_object_id;
+	}
+
+	/**
 	 * Saves an item to the navigation table
 	 * 
 	 * @param $navigation_text

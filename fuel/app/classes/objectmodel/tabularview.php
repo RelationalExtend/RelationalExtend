@@ -80,7 +80,7 @@ class ObjectModel_TabularView {
 			$fields_to_include[] = array($description_field, 'description_field');
 		
 		if($thumbnail_field != null)
-			$fields_to_include[] = array($thumbnail_field_field, 'thumbnail_field');
+			$fields_to_include[] = array($thumbnail_field, 'thumbnail_field');
 		
 		foreach($additional_fields as $additional_field_key => $additional_field_value)
 			$fields_to_include[] = array($additional_field_key, $additional_field_value);

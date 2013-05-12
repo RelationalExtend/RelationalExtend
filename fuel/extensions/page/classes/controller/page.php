@@ -11,6 +11,15 @@ namespace page;
 class Controller_Page extends \Controller_Public {
     public function action_index($page_slug = "")
     {
-        return $this->render_layout("main_layout_file", array("page_slug" => $page_slug));
+		$set_slug = $page_slug;
+			
+    	if($page_slug == "")
+		{
+			$page_id = \Navigation::get_landing_page();
+			$page = Page::get_page_by_id($page_id);
+			$set_slug = $page[0]["page_slug"];
+		}
+		
+        return $this->render_layout("main_layout_file", array("page_slug" => $set_slug));
     }
 }

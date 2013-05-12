@@ -29,4 +29,15 @@ class Page {
 
         return $pages;
     }
+	
+	public static function get_page_by_id($page_id)
+    {
+        $pages = \Fuel\Core\DB::select("*")->from(Page_Setup::TABLE_PAGES)
+                ->where("id", "=", $page_id)
+                ->and_where("page_status", "=", "Live")
+                ->and_where("page_active", "=", 1)
+                ->execute()->as_array();
+
+        return $pages;
+    }
 }
