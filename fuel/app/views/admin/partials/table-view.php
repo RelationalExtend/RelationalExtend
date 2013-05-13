@@ -8,7 +8,7 @@
         <thead>
             <tr>
                 <?php if(isset($table_rows[0]->description_field)) { ?>
-                	<th style="width: 60%;">Rows</th>
+                	<th style="width: 40%;">Rows</th>
             	<?php } ?>
             	<?php foreach($additional_fields as $additional_field_key => $additional_field_value) { ?>
             		<?php if(isset($column_titles[$additional_field_value])) { ?>
