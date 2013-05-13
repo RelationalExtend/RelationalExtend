@@ -375,7 +375,12 @@ class AdminHelpers {
         {
             $end_page = $number_of_pages;
         }
-
+		
+		if($next_page < $previous_page)
+		{
+			$next_page = $previous_page;
+		}
+		
         $page_links_string = "";
 
         $page_links_string.="<li><a href='".$pagination_link.$previous_page."'>&laquo;</a></li>";
