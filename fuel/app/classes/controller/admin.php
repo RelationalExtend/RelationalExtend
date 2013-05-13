@@ -312,7 +312,8 @@ class Controller_Admin extends Controller_Template {
         $view = View::forge("admin/partials/table-view", array("table_rows" => $record_array,
              "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
              "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
-             "return_path" => $tabular_view_descriptor->return_path, "additional_fields" => $tabular_view_descriptor->get_additional_fields()));
+             "return_path" => $tabular_view_descriptor->return_path, "additional_fields" => $tabular_view_descriptor->get_additional_fields(),
+			 "column_titles" => $tabular_view_descriptor->column_titles));
 
         return $view;
     }

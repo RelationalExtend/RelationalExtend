@@ -10,8 +10,12 @@
                 <?php if(isset($table_rows[0]->description_field)) { ?>
                 	<th style="width: 60%;">Rows</th>
             	<?php } ?>
-            	<?php foreach($additional_fields as $additional_field_key => $additinal_field_value) { ?>
-            		<th><?php echo($additional_field_value); ?></th>
+            	<?php foreach($additional_fields as $additional_field_key => $additional_field_value) { ?>
+            		<?php if(isset($column_titles[$additional_field_value])) { ?>
+            			<th><?php echo($column_titles[$additional_field_value]); ?></th>
+        			<?php } else { ?>
+            			<th><?php echo($additional_field_value); ?></th>
+            		<?php } ?>
         		<?php } ?>
         		<th>Actions</th>
             </tr>
@@ -22,10 +26,14 @@
                 <?php if(isset($table_row->description_field)) { ?>
             		<td><?php echo($table_row->description_field); ?></td>
         		<?php } ?>                
-                <?php foreach($additional_fields as $additional_field_key => $additinal_field_value) { ?>
-            		<th><?php echo($table_row->$additional_field_value); ?></th>
+                <?php foreach($additional_fields as $additional_field_key => $additional_field_value) { ?>
+            		<td><?php echo($table_row->$additional_field_value); ?></td>
         		<?php } ?>
-                <td><?php echo(AdminHelpers::bootstrap_buttons($table_row->buttons)); ?></td>
+        		<?php if (isset($table_row->buttons)) { ?>
+                	<td><?php echo(AdminHelpers::bootstrap_buttons($table_row->buttons)); ?></td>
+                <?php } else { ?>
+                	<td>No actions</td>
+            	<?php } ?>
             </tr>
 <?php } ?>
         </tbody>

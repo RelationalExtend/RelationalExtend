@@ -20,6 +20,8 @@ class ObjectModel_TabularView {
     public $controller_path = "";
     public $records_not_in = array();
 	public $filter_conditions = array();
+	public $display_rules = array();
+	public $column_titles = array();
 
     public $add_button_visible = true;
     public $edit_button_visible = true;
@@ -168,6 +170,14 @@ class ObjectModel_TabularView {
 
             $this->record_objects = $this->records->as_object()->execute();
             $this->executed = true;
+			
+			foreach($this->display_rules as $display_rule_key => $display_rule_value)
+			{
+				foreach($this->record_objects as $record_object)
+				{
+					$record_object->$display_rule_key = call_user_func($display_rule_value, $display_rule_key, $record_object->$display_rule_key);
+				}
+			}
 
             foreach($this->record_objects as $record)
             {
