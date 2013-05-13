@@ -28,7 +28,7 @@
             <h1>Blog posts</h1>
 
             {{ blog:posts }}
-                <h2><a href="http://localhost:8888/relationalcms-fuel/public/blog/blog/post/{{ post_url }}">{{ blog_title }}</a></h2>
+                <h2><a href="{{ post_url }}">{{ blog_title }}</a></h2>
                 <p>{{ blog_summary }}</p>
                 <hr/>
             {{ /blog:posts }}

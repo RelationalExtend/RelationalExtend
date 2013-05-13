@@ -113,6 +113,10 @@ class ObjectModel_FormView {
 				case DBFieldMeta::CONTROL_MULTISELECT:
 					$selected_values = Input::post($object_meta_data_item->object_meta_slug);
 					$table_name = Input::post("checkbox_".$object_meta_data_item->object_meta_slug);
+					
+					if(!is_array($selected_values))
+						$selected_values = array();
+					
 					$value_to_set = "($table_name)|".implode("|", $selected_values);
 					break;
                 case DBFieldMeta::CONTROL_CHECKBOX:

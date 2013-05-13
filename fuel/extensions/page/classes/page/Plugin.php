@@ -9,18 +9,5 @@
 namespace page;
  
 class Page_Plugin implements \IPlugin {
-    public function pages($attributes, $content)
-    {
-        $pages = array();
-
-        if(isset($attributes["slug"])) {
-            $slug = $attributes["slug"];
-            $pages = Page::get_page_by_slug($slug);
-        }
-        else {
-            $pages = Page::get_pages();
-        }
-        
-        return $pages;
-    }
+	// Plugin logic ?
 }

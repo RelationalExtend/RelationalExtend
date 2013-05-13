@@ -106,11 +106,18 @@ class Navigation {
 		$page_module_installed = CMSInit::is_extension_installed(self::NAV_PAGE);
 		$navigation_items = array();
 		
+		Config::load("navigation", "nav");
+		
 		foreach($navigation_records as $navigation_record)
 		{
 			if($navigation_record->navigation_type == self::NAV_PAGE)
 			{
 				$page_urls = Uri::base()."page/page/index/";
+				
+				$nav_url = Config::get("nav.page.short_route", null);
+				
+				if($nav_url != null)
+					$page_urls = Uri::base().$nav_url;
 				
 				if(in_array(self::NAV_PAGE, $short_urls))
 				{
@@ -140,6 +147,11 @@ class Navigation {
 				if(CMSInit::is_extension_installed($extension_folder))
 				{
 					$extension_url = Uri::base()."$extension_folder/$extension_folder";
+				
+					$nav_url = Config::get("nav.".$extension_folder.".short_route", null);
+					
+					if($nav_url != null)
+						$extension_url = Uri::base().$nav_url;
 					
 					if(in_array($extension_folder, $short_urls))
 					{

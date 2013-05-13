@@ -28,8 +28,9 @@ class Blog_Extension implements \IExtension {
             {
                 return array("title" => $blog_post[0]["blog_title"], "body" => $blog_post[0]["blog_content"]);
             }
-
-            throw new Exception_Blog("Specified blog post does not exist");
+			else {
+				throw new Exception_Blog("Specified blog post does not exist");
+			}  
         }
         else
         {
