@@ -37,6 +37,24 @@ class Plugin_Theme {
 
         return "<link rel='stylesheet' href='".Uri::base()."segments/css/".$slug."'>";
     }
+	
+	/**
+     * Get Theme Image
+     *
+     * @static
+     * @param $attributes
+     * @param $content
+     * @return tag
+     */
+	
+	public function img($attributes, $content)
+	{
+		$active_theme = CMSTheme::get_installed_default_theme();
+		$theme_folder = $active_theme->theme_folder;
+		$image_name = $attributes["name"];
+		
+		return "<img src='".DOCROOT."assets/theme-images/".$theme_folder."/".$image_name."'/>";
+	}
 
     /**
      * Get partial content

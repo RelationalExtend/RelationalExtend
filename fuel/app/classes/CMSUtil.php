@@ -7,6 +7,21 @@
  */
 
 class CMSUtil {
+	/**
+	 * Creates pagination for records
+	 * 
+	 * @param table
+	 * @param query_object
+	 * @param conditions = array()
+	 * @param paged = true
+	 * @param page_number = 1
+	 * @param controller_path = ""
+	 * @param action_name = ""
+	 * @param page_size = 20
+	 * 
+	 * @return pagination_records
+	 */
+	 
     public static function create_pagination_records($table, &$query_object, $conditions = array(), $paged = true, $page_number = 1,
         $controller_path = "", $action_name = "", $page_size = 20)
     {
@@ -48,4 +63,45 @@ class CMSUtil {
 
         return $pagination_records;
     }
+
+	/**
+	 * Function to copy from source to destination all contents of a folder
+	 * 
+	 * @param source
+	 * @param dest
+	 */
+
+	public static function xcopy($source, $dest, $permissions = 0755)
+	{
+	    // Check for symlinks
+	    if (is_link($source)) {
+	        return symlink(readlink($source), $dest);
+	    }
+	
+	    // Simple copy for a file
+	    if (is_file($source)) {
+	        return copy($source, $dest);
+	    }
+	
+	    // Make destination directory
+	    if (!is_dir($dest)) {
+	        mkdir($dest, $permissions);
+	    }
+	
+	    // Loop through the folder
+	    $dir = dir($source);
+	    while (false !== $entry = $dir->read()) {
+	        // Skip pointers
+	        if ($entry == '.' || $entry == '..') {
+	            continue;
+	        }
+	
+	        // Deep copy directories
+	        self::xcopy("$source/$entry", "$dest/$entry");
+	    }
+	
+	    // Clean up
+	    $dir->close();
+	    return true;
+	}
 }

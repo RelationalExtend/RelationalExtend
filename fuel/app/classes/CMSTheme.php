@@ -26,6 +26,7 @@ class CMSTheme {
     const STYLES_FOLDER = "css/";
     const JAVASCRIPT_FOLDER = "js/";
     const IMAGES_FOLDER = "images/";
+	const PUBLIC_THEME_IMAGES_FOLDER = "theme-images/";
 
     const THEME_PREFIX = "theme";
     const LAYOUT_PREFIX = "layouts";
@@ -421,7 +422,7 @@ class CMSTheme {
      *
      * @static
      * @throws Exception_Theme
-     * @return
+     * @return theme_id
      */
 
     public static function get_installed_default_theme_id()
@@ -433,6 +434,25 @@ class CMSTheme {
             throw new Exception_Theme("There is no default theme set up");
 
         return $installed_theme[0]->theme_id;
+    }
+	
+	/**
+     * Gets the default installed theme data
+     *
+     * @static
+     * @throws Exception_Theme
+     * @return theme data
+     */
+
+    public static function get_installed_default_theme()
+    {
+        $installed_theme = DB::select("theme_id")->from(self::TABLE_THEMES)
+                ->where(ThemeInfo::SEGMENT_THEME_ACTIVE, "=", 1)->as_object()->execute();
+
+        if(count($installed_theme) < 1)
+            throw new Exception_Theme("There is no default theme set up");
+
+        return $installed_theme[0];
     }
 
     /**
@@ -730,6 +750,22 @@ class CMSTheme {
             }
 
             DB::commit_transaction();
+			
+			// Copy theme images
+			
+			$folder_name = basename($theme_path);
+			$public_image_theme_folder = DOCROOT."assets/".self::PUBLIC_THEME_IMAGES_FOLDER.$folder_name;
+			
+			// Create folder if not exists
+			
+			if(!file_exists($public_image_theme_folder))
+				mkdir($public_image_theme_folder);
+			
+			$source_folder = rtrim($theme_path,"/")."/".self::IMAGES_FOLDER;
+			
+			// Copy
+			
+			CMSUtil::xcopy($source_folder, $public_image_theme_folder);
         }
     }
 
