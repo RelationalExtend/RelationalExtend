@@ -53,7 +53,7 @@ class Plugin_Theme {
 		$theme_folder = $active_theme->theme_folder;
 		$image_name = $attributes["name"];
 		
-		return "<img src='".DOCROOT."assets/theme-images/".$theme_folder."/".$image_name."'/>";
+		return "<img src='".Uri::base()."public/assets/theme-images/".$theme_folder."/".$image_name."'/>";
 	}
 
     /**
