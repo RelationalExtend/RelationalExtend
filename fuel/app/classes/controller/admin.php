@@ -364,7 +364,7 @@ class Controller_Admin extends Controller_Template {
         $form_view->page_title = $page_title;
         $form_view->page_content = $page_content;
         $form_view->form_action = $form_action;
-        $form_view->preset_form_fields = $this->preset_form_fields();
+        $form_view->preset_form_fields = $this->preset_form_fields($table_slug);
 
         $view = View::forge("admin/partials/record-view", array("page_rows" => $form_view->get_object_meta_data(),
                     "record_id" => $record_id, "page_title" => $page_title, "page_title_content" => $page_content,
@@ -442,7 +442,7 @@ class Controller_Admin extends Controller_Template {
      * @return array()
      */
 
-    protected function preset_form_fields()
+    protected function preset_form_fields($table_slug)
     {
         // To be overridden
         return array();
