@@ -189,8 +189,14 @@ class Navigation {
 			->where("navigation_type", "=", self::NAV_PAGE)
 			->limit(1)
 			->as_object()->execute();
-			
-		return $navigation_records[0]->navigation_object_id;
+		
+		if(is_array($navigation_records))
+		{
+			if(count($navigation_records) > 0)
+				return $navigation_records[0]->navigation_object_id;
+		}	
+	
+		return null;	
 	}
 
 	/**

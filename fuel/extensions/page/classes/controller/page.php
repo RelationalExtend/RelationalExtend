@@ -16,7 +16,15 @@ class Controller_Page extends \Controller_Public {
     	if($page_slug == "")
 		{
 			$page_id = \Navigation::get_landing_page();
-			$page = Page::get_page_by_id($page_id);
+			
+			if($page_id != null)
+			{
+				$page = Page::get_page_by_id($page_id);
+			}
+			else 
+			{
+				throw new \Exception_CMS("No landing page defined");
+			}
 			$set_slug = $page[0]["page_slug"];
 		}
 		
