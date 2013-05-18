@@ -20,12 +20,12 @@ class Controller_Page extends \Controller_Public {
 			if($page_id != null)
 			{
 				$page = Page::get_page_by_id($page_id);
+				$set_slug = $page[0]["page_slug"];
 			}
 			else 
 			{
 				throw new \Exception_CMS("No landing page defined");
-			}
-			$set_slug = $page[0]["page_slug"];
+			}			
 		}
 		
         return $this->render_layout("main_layout_file", array("page_slug" => $set_slug));

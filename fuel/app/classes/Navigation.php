@@ -190,11 +190,9 @@ class Navigation {
 			->limit(1)
 			->as_object()->execute();
 		
-		if(is_array($navigation_records))
-		{
-			if(count($navigation_records) > 0)
-				return $navigation_records[0]->navigation_object_id;
-		}	
+
+		if(count($navigation_records) > 0)
+			return $navigation_records[0]->navigation_object_id;	
 	
 		return null;	
 	}
