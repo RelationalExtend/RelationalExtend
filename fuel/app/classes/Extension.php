@@ -452,19 +452,49 @@ class Extension {
 	 * @return result
 	 */
 	
-	public static function save_extension_setting($extension_id, $setting_id, $value)
-	{	
-		if($extension_id > 0)
+	public static function save_extension_setting($extension_id, $setting_id, $value, $setting_slug = "")
+	{
+		$field_slug = "";
+		$field_value = "";
+		$table_name = "";
+		$setting_field = "";
+			
+		if($setting_id == 0 && $setting_slug != "")
 		{
-			return $result = DB::update(ExtensionSetup::EXTENSION_SETTINGS_TABLE)->set(array("extension_setting_value" => $value))
-				->where("extension_setting_id", "=", $setting_id)
-				->execute();
+			$setting_field = $setting_slug;
+			
+			if($extension_id > 0)
+			{
+				$field_slug = "extension_setting_slug";
+				$field_value = "extension_setting_value";
+				$table_name = ExtensionSetup::EXTENSION_SETTINGS_TABLE;
+			}
+			else 
+			{
+				$field_slug = "setting_slug";
+				$field_value = "setting_value";
+				$table_name = CMSInit::TABLE_SETTINGS;
+			}
 		}
 		else 
 		{
-			return $result = DB::update(CMSInit::TABLE_SETTINGS)->set(array("setting_value" => $value))
-				->where("setting_id", "=", $setting_id)
-				->execute();
+			$setting_field = $setting_id;
+			
+			if($extension_id > 0)
+			{
+				$field_slug = "extension_setting_id";
+				$field_value = "extension_setting_value";
+				$table_name = ExtensionSetup::EXTENSION_SETTINGS_TABLE;
+			}
+			else {
+				$field_slug = "setting_id";
+				$field_value = "setting_value";
+				$table_name = CMSInit::TABLE_SETTINGS;
+			}
 		}
+		
+		return $result = DB::update($table_name)->set(array($field_value => $value))
+				->where($field_slug, "=", $setting_field)
+				->execute();
 	}
 }
