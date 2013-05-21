@@ -22,6 +22,8 @@ class ObjectModel_FormView {
     private $object_meta_data;
 
     private $records = null;
+	
+	public static $last_insert_id = 0;
 
     /**
      * Constructor
@@ -127,7 +129,7 @@ class ObjectModel_FormView {
 					$value_sets = array('object_name' => $object);
 					$value_sets = array_merge(Input::post(), $value_sets);
 					
-                    $value_to_set = $controller->special_field_operation($object_meta_data_item->object_meta_slug, $value_sets);
+                    $value_to_set = $controller->special_field_operation($object, $object_meta_data_item->object_meta_slug, $value_sets);
                         
                     if($value_to_set == false) {
                         $skip_control = true;
@@ -183,6 +185,7 @@ class ObjectModel_FormView {
             }
             else {
                 list($insert_id, $rows_affected) = $update_object->set($database_array)->execute();
+				self::$last_insert_id = $insert_id;
             }
 			
 			// Save multiple select values in a related table
