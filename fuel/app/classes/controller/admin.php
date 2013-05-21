@@ -702,7 +702,7 @@ class Controller_Admin extends Controller_Template {
                 if(trim(Input::post("return_path")) != "")
                 {
                     if(trim(Input::post("return_path")) != "null") {
-                        $redirect_url = $redirect_url."/".ltrim(Input::post("return_path"), "/");
+                        $redirect_url = rtrim($redirect_url, "/")."/".ltrim(Input::post("return_path"), "/");
                     }
                 }
 
