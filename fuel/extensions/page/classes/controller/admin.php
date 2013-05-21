@@ -162,7 +162,7 @@ class Controller_Admin extends \cms\Controller_CMS {
         }
     }
 
-    public function special_field_operation($field_name, $value_sets)
+    public function special_field_operation($object, $field_name, $value_sets)
     {
         $value = null;
 		

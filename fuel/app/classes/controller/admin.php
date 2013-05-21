@@ -425,12 +425,13 @@ class Controller_Admin extends Controller_Template {
     /**
      * Override this for special fields
      *
+	 * @param $object
      * @param $field_name
      * @param $value_sets
      * @return null
      */
 
-    public function special_field_operation($field_name, $value_sets)
+    public function special_field_operation($object, $field_name, $value_sets)
     {
         // To be overridden
         return null;

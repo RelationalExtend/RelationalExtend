@@ -73,7 +73,7 @@ class Controller_Admin extends \cms\Controller_CMS {
         $this->build_admin_interface($main_interface);
     }
 
-    public function special_field_operation($field_name, $value_sets)
+    public function special_field_operation($object, $field_name, $value_sets)
     {
         $value = null;
 		
