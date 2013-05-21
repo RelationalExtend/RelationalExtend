@@ -690,8 +690,14 @@ class Controller_Admin extends Controller_Template {
         // Save records and get record ids
 
         $result = ObjectModel_FormView::save_records_to_db($object, $record_id, $object_meta_data, $database_array, $media_upload_path);
+		$last_insert_id = ObjectModel_FormView::$last_insert_id;
+		
+		if($record_id > 0)
+			$last_insert_id = $record_id;
 
         // Finalize
+        
+        $this->after_update($last_insert_id, $media_upload_path);
 
         $strlen_url_from = strlen($url_from);
 
@@ -705,15 +711,29 @@ class Controller_Admin extends Controller_Template {
                         $redirect_url = rtrim($redirect_url, "/")."/".ltrim(Input::post("return_path"), "/");
                     }
                 }
-
+                
                 Response::redirect($redirect_url);
             }
             elseif($save_value) {
+				
                 $redirect_url = strpos($url_from, "/null/success", $strlen_url_from - 8) == FALSE ? "$url_from/null/success" : $url_from;
                 Response::redirect($redirect_url);
             }
         }
     }
+
+	/**
+     * Default post_update action
+     *
+	 * @param record_id
+     * @param null $media_upload_path
+     * @return status
+     */
+
+	protected function after_update($record_id, $media_upload_path = null)
+	{
+		return true;
+	}
 
     /**
      * Default delete interface
