@@ -28,10 +28,15 @@ class Settings {
      * @return setting_rows
      */
 
-    public function get_extension_settings($extension_id)
+    public function get_extension_settings($extension_id, $slug = "")
     {
         $extension_settings = DB::select("*")->from(self::EXTENSION_SETTINGS_TABLE)
-                ->where("extension_setting_extension_id", "=", $extension_id)->as_object()->execute();
+            ->where("extension_setting_extension_id", "=", $extension_id);
+				
+		if($slug != "")
+			$extension_settings = $extension_settings->where("extension_setting_slug", "=", $slug);
+				
+		$extension_settings = $extension_settings->as_object()->execute();
 
         return $extension_settings;
     }
@@ -43,10 +48,15 @@ class Settings {
      * @return setting
      */
 
-    public function get_public_setting($setting_slug)
+    public function get_public_setting($setting_slug, $slug = "")
     {
         $settings = DB::select("*")->from(self::PUBLIC_SETTINGS_TABLE)
-                ->where("setting_slug", "=", $setting_slug)->as_object()->execute();
+            ->where("setting_slug", "=", $setting_slug);
+		
+		if($slug != "")
+			$settings = $settings->where("setting_slug", "=", $slug);
+			
+		$settings = $settings->as_object()->execute();
 
         return $settings;
     }
