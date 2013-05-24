@@ -161,7 +161,7 @@ class ObjectModel_TabularView {
 			{
 				if(count($this->filter_conditions) > 0)
 				{
-					foreach($this->records_not_in as $field => $record_condition)
+					foreach($this->filter_conditions as $field => $record_condition)
                     {
                         $this->records = $this->records->where($field, '=', $record_condition);
                     }
