@@ -260,7 +260,7 @@ class Controller_CMS extends \Controller_Admin {
 			
 			if($old_password != false && $new_password != false)
 			{
-				$result = \Auth\Auth::change_password($old_password, $new_password, $user_name);
+				$result = \Auth\Auth::instance()->change_password($old_password, $new_password, $user_name);
 				
 				if($result == false)
 				{
