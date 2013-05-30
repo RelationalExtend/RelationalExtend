@@ -358,6 +358,13 @@ class AdminHelpers {
 		$previous_page = $current_page - 1;
 		$next_page = $current_page + 1;
 		
+		if($end_page > $number_of_pages)
+		{
+			$difference = $end_page - $number_of_pages;
+			$end_page = $number_of_pages;
+			$start_page = $start_page - $difference;
+		}
+		
 		if($start_page < 1)
 		{
 			$difference = $start_page * (-1);
@@ -367,9 +374,10 @@ class AdminHelpers {
 		
 		if($end_page > $number_of_pages)
 		{
-			$difference = $end_page - $number_of_pages;
-			$end_page = $number_of_pages;
-			$start_page = $start_page - $difference;
+			if($number_of_pages == 0)
+				$end_page = 1;
+			else
+				$end_page = $number_of_pages;
 		}
 		
 		if($previous_page < 1)
@@ -379,7 +387,10 @@ class AdminHelpers {
 		
 		if($next_page > $number_of_pages)
 		{
-			$next_page = $number_of_pages;
+			if($number_of_pages == 0)
+				$next_page = 1;
+			else
+				$next_page = $number_of_pages;
 		}
 		
         $page_links_string = "";
