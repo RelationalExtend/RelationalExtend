@@ -348,37 +348,38 @@ class AdminHelpers {
         $current_page = intval($pagination_records->current_page);
         $pagination_link = $pagination_records->pagination_link;
         $pagination_size = intval($pagination_records->pagination_size);
+		$mid_range = ceil($pagination_size / 2);
 
         $page_difference = $number_of_pages - $current_page;
-        $start_page = $number_of_pages - ($pagination_size - $page_difference);
-        $end_page = $start_page + ($pagination_size - $page_difference);
-
-        $previous_page = $current_page - 1;
-        $next_page = $current_page + 1;
-
-        if($previous_page < 1)
-        {
-            $previous_page = 1;
-        }
-
-        if($next_page > $number_of_pages)
-        {
-            $next_page = $number_of_pages;
-        }
-
-        if($start_page < 1)
-        {
-            $start_page = 1;
-        }
-
-        if($end_page > $number_of_pages)
-        {
-            $end_page = $number_of_pages;
-        }
 		
-		if($next_page < $previous_page)
+		$start_page = $current_page - $mid_range;
+		$end_page = $start_page + $pagination_size;
+		
+		$previous_page = $current_page - 1;
+		$next_page = $current_page + 1;
+		
+		if($start_page < 1)
 		{
-			$next_page = $previous_page;
+			$difference = $start_page * (-1);
+			$start_page = 1;
+			$end_page = $end_page + $difference;
+		}
+		
+		if($end_page > $number_of_pages)
+		{
+			$difference = $end_page - $number_of_pages;
+			$end_page = $number_of_pages;
+			$start_page = $start_page - $difference;
+		}
+		
+		if($previous_page < 1)
+		{
+			$previous_page = 1;
+		}
+		
+		if($next_page > $number_of_pages)
+		{
+			$next_page = $number_of_pages;
 		}
 		
         $page_links_string = "";

@@ -13,7 +13,7 @@ class ObjectModel_TabularView {
     public $return_path = "";
     public $paged = true;
     public $page_number = 1;
-    public $page_size = 20;
+    public $page_size = 15;
     public $action_name = null;
     public $order_by = null;
     public $direction = 'asc';
