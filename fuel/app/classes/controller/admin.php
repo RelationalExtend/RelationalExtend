@@ -359,14 +359,14 @@ class Controller_Admin extends Controller_Template {
      */
     
     protected function build_admin_ui_form_view($page_title, $page_content, $table_slug, $form_action,
-        $record_id = 0, $return_path = "")
+        $record_id = 0, $return_path = null)
     {
         // Record view data here
 
         $form_view = new ObjectModel_FormView($table_slug, $record_id, $return_path);
         $form_view->page_title = $page_title;
         $form_view->page_content = $page_content;
-        $form_view->form_action = $form_action;
+        $form_view->form_action = rtrim($form_action, "/")."/?return=".$return_path;
         $form_view->preset_form_fields = $this->preset_form_fields($table_slug);
 
         $view = View::forge("admin/partials/record-view", array("page_rows" => $form_view->get_object_meta_data(),
@@ -701,11 +701,13 @@ class Controller_Admin extends Controller_Template {
      * @return void
      */
 
-    public function action_edit($table, $record_id = 0, $return_path = "", $success_string = "")
+    public function action_edit($table, $record_id = 0, $success_string = "")
     {
     	$this->check_access_level_content();
 		
         // Default edit interface
+        
+        $return_path = Input::get("return", Uri::base().$this->controller_path);
 
         $action = "Edit";
         $records = null;
@@ -783,9 +785,12 @@ class Controller_Admin extends Controller_Template {
                 
                 Response::redirect($redirect_url);
             }
-            elseif($save_value) {
-				
-                $redirect_url = strpos($url_from, "/null/success", $strlen_url_from - 8) == FALSE ? "$url_from/null/success" : $url_from;
+            else if($save_value) {
+				$get_return = Input::get("return", null);
+				$new_url_from = str_replace("/?return=$get_return", "/", $url_from);
+				$new_url_from = rtrim($new_url_from, "/");
+				$get_return_len = strlen($get_return);
+                $redirect_url = strpos($url_from, "/success/?return=$get_return", $strlen_url_from - (17 + $get_return_len)) == FALSE ? "$new_url_from/success/?return=$get_return" : $url_from;
                 Response::redirect($redirect_url);
             }
         }

@@ -43,7 +43,7 @@ class Controller_Admin extends \cms\Controller_CMS {
         $table_view_descriptor->page_title = "Blog posts";
         $table_view_descriptor->page_content = "Manage blog posts";
 		
-		$table_view_descriptor->return_path = "index";
+		$table_view_descriptor->return_path = "index/$page_number";
 
         $list_interface = $this->build_admin_ui_tabular_list($table_view_descriptor, "index");
 

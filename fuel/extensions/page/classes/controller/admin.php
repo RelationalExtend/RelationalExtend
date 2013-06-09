@@ -135,7 +135,7 @@ class Controller_Admin extends \cms\Controller_CMS {
             $table_view_descriptor->set_additional_buttonfields(array("Add media" => "media/{{ record_id }}/1"));
 
 		$table_view_descriptor->set_bulk_action_buttons(array(self::BULK_DELETE, self::BULK_ACTIVATE, self::BULK_DEACTIVATE));
-		$table_view_descriptor->return_path = \Fuel\Core\Uri::base().$this->controller_path."index/$page_number";
+		$table_view_descriptor->return_path = "index/$page_number";
 
         // Build the UI
 
