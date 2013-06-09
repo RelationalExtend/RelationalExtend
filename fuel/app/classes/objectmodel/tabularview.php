@@ -8,6 +8,8 @@
  
 class ObjectModel_TabularView {
     
+	// Layout and behavior
+	
     public $page_title;
     public $page_content;
     public $return_path = "";
@@ -23,6 +25,8 @@ class ObjectModel_TabularView {
 	public $display_rules = array();
 	public $column_titles = array();
 
+	// Buttons
+
     public $add_button_visible = true;
     public $edit_button_visible = true;
     public $delete_button_visible = true;
@@ -33,6 +37,12 @@ class ObjectModel_TabularView {
     private $add_button = null;
     private $edit_buttons = array();
     private $delete_buttons = array();
+	
+	private $bulk_action_buttons = array();
+	private $bulk_actions_enabled = false;
+	private $bulk_actions = null;
+
+	// Database functionality
 
     private $table_name;
     private $id_field;
@@ -43,6 +53,8 @@ class ObjectModel_TabularView {
     private $records;
     private $sort_field = "";
     private $sort_direction = "";
+
+	// Processed fields
 
     private $executed = false;
     private $record_objects;
@@ -135,6 +147,63 @@ class ObjectModel_TabularView {
 
         $this->additional_button_fields = $additional_buttons;
     }
+	
+	/**
+     * Set up bulk action buttons
+     *
+     * @param $additional_buttons
+     * @return
+     */
+
+    public function set_bulk_action_buttons($action_buttons)
+    {
+    	$this->bulk_actions_enabled = false;
+		
+        if(!is_array($action_buttons))
+            return;
+
+		if(count($action_buttons) > 0)
+		{
+			$this->bulk_actions_enabled = true;
+        	$this->bulk_action_buttons = $action_buttons;
+		}	
+    }
+	
+	/**
+	 * Gets bulk action buttons
+	 * 
+	 * @return buttons
+	 */
+	
+	public function get_bulk_action_buttons()
+	{
+		return $this->bulk_action_buttons;
+	}
+	
+	/**
+	 * Gets bulk action buttons
+	 * 
+	 * @return string
+	 */
+	
+	public function get_bulk_actions()
+	{
+		if(!$this->is_bulk_actions_enabled())
+			return null;
+		
+		return $this->bulk_actions;
+	}
+	
+	/**
+	 * Gets status of bulk actions
+	 * 
+	 * @return bool
+	 */
+	
+	public function is_bulk_actions_enabled()
+	{
+		return $this->bulk_actions_enabled;
+	}
 
     /**
      * Execute the query
@@ -219,6 +288,16 @@ class ObjectModel_TabularView {
 
             if($this->add_button_visible)
                 $this->bottom_buttons = array($this->add_button);
+			
+			if($this->is_bulk_actions_enabled())
+			{
+				$this->bulk_actions = "";
+				
+				foreach($this->bulk_action_buttons as $button)
+				{
+					$this->bulk_actions.= AdminHelpers::build_bootstrap_submit_button($button);
+				}
+			}
         }
 
         return $this->record_objects;

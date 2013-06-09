@@ -148,6 +148,26 @@ class AdminHelpers {
         return $button_html;
     }
 
+	/**
+     * Returns bootstrap submit buttons
+     *
+     * @static
+     * @param array $buttons
+     * @return string
+     */
+
+    public static function bootstrap_submit_buttons($buttons = array())
+    {
+        $button_html = "";
+
+        foreach($buttons as $button)
+        {
+            $button_html.="<input type='submit' name='submit' value='".$button."' class='btn' style='margin-right:5px;' />";
+        }
+
+        return $button_html;
+    }
+
     /**
      * Build a record level label
      *
@@ -431,5 +451,18 @@ class AdminHelpers {
         $my_button->button_text = $text;
 
         return $my_button;
+    }
+	
+	/**
+     * Build a twitter bootstrap submit button
+     *
+     * @param $name
+	 * @param $text
+     * @return stdClass
+     */
+	
+	public static function build_bootstrap_submit_button($text)
+    {
+        return self::bootstrap_submit_buttons(array($text));
     }
 }

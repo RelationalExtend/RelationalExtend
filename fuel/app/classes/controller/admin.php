@@ -313,7 +313,9 @@ class Controller_Admin extends Controller_Template {
              "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
              "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
              "return_path" => $tabular_view_descriptor->return_path, "additional_fields" => $tabular_view_descriptor->get_additional_fields(),
-			 "column_titles" => $tabular_view_descriptor->column_titles));
+			 "column_titles" => $tabular_view_descriptor->column_titles, "bulk_actions_enabled" => $tabular_view_descriptor->is_bulk_actions_enabled(),
+			 "bulk_actions" => $tabular_view_descriptor->get_bulk_actions(), "controller_path" => Uri::base().$this->controller_path,
+			 "return_path" => $tabular_view_descriptor->return_path));
 
         return $view;
     }
@@ -551,6 +553,40 @@ class Controller_Admin extends Controller_Template {
 			
 		return $setting[0]->value;
 	}
+	
+	/**
+	 * Gets selected checkboxes with ids
+	 * 
+	 * @return array of ids
+	 */
+	
+	protected function get_selected_checkboxes()
+	{
+		$selected_items = array();
+		$selected_boxes = Input::post("chk_ids", null);
+		
+		if(is_array($selected_boxes))
+		{
+			foreach($selected_boxes as $selected_box)
+			{
+				$selected_items[] = $selected_box;
+			}
+		}
+		
+		return $selected_items;
+	}
+	
+	/**
+	 * Gets the selected bulk action
+	 * 
+	 * @return action_name
+	 */
+	
+	protected function get_selected_bulk_action()
+	{
+		return Input::post("submit", null);
+	}
+	
 
     /**
      * The first function to be executed before the controller is executed fully
@@ -1355,4 +1391,15 @@ class Controller_Admin extends Controller_Template {
             throw new HttpNotFoundException();
         }
     }
+	
+	/**
+     * Performs bulk action operations
+     *
+     * @return void
+     */
+	
+	public function action_bulkactions()
+	{
+		Response::redirect(Input::post("return_path", Uri::base().$this->controller_path."index"));
+	}
 }

@@ -21,6 +21,8 @@ class DBFieldMeta {
 	
 	const FIELD_RELATIONSHIP_MASTER_FIELD = "id_master";
 	const FIELD_RELATIONSHIP_DETAIL_FIELD = "id_detail";
+	
+	// Core controls
 
     const CONTROL_SIMPLE_TEXT = "simpletext";
     const CONTROL_NUMERIC = "numeric";
@@ -33,6 +35,9 @@ class DBFieldMeta {
     const CONTROL_CHECKBOX = "checkbox";
 	const CONTROL_MULTISELECT = "multiselect";
     const CONTROL_FILE = "file";
+	
+	// Custom control
+	
 	const CONTROL_CUSTOM = "custom";
 
     public $field_name;
@@ -53,7 +58,8 @@ class DBFieldMeta {
      * @param $control_values
      */
 
-    public function __construct($field_name, $field_slug, $field_type, $field_size, $control_type, $control_values)
+    public function __construct($field_name, $field_slug, $field_type = null, $field_size = null, $control_type = null, 
+    	$control_values = null)
     {
         $this->field_name = $field_name;
         $this->field_slug = $field_slug;

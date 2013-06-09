@@ -18,6 +18,10 @@ class Controller_Admin extends \cms\Controller_CMS {
 
     const MEDIA_EXTENSION = "media";
     const MEDIA_PAGE_SIZE = 20;
+	
+	const BULK_DELETE = "Delete selected";
+	const BULK_ACTIVATE = "Activate selected";
+	const BULK_DEACTIVATE = "Deactivate selected";
 
     private function build_nav_menu_vars($pages_active, $media_active)
     {
@@ -83,6 +87,9 @@ class Controller_Admin extends \cms\Controller_CMS {
 
         if($this->media_active)
             $table_view_descriptor->set_additional_buttonfields(array("Add media" => "media/{{ record_id }}/1"));
+
+		$table_view_descriptor->set_bulk_action_buttons(array(self::BULK_DELETE, self::BULK_ACTIVATE, self::BULK_DEACTIVATE));
+		$table_view_descriptor->return_path = \Fuel\Core\Uri::base().$this->controller_path."index/$page_number";
 
         // Build the UI
 
@@ -161,6 +168,27 @@ class Controller_Admin extends \cms\Controller_CMS {
             throw new \Fuel\Core\HttpNotFoundException();
         }
     }
+	
+	public function action_bulkactions()
+	{
+		$selected_ids = $this->get_selected_checkboxes();
+		$action = $this->get_selected_bulk_action();
+		
+		switch($action)
+		{
+			case self::BULK_DELETE:
+				// Todo: Bulk logic
+				break;
+			case self::BULK_ACTIVATE:
+				// Todo: Bulk logic
+				break;
+			case self::BULK_DEACTIVATE:
+				// Todo: Bulk logic
+				break;
+		}
+		
+		parent::action_bulkactions();
+	}
 
     public function special_field_operation($object, $field_name, $value_sets)
     {
