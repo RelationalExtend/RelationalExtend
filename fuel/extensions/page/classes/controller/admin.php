@@ -89,7 +89,7 @@ class Controller_Admin extends \cms\Controller_CMS {
 			Page::activate_page($page_id);
 		}
 		
-		\Fuel\Core\Response::redirect($return_path);
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path.$return_path);
 	}
 	
 	private function bulk_deactivate($ids, $return_path = null)
@@ -99,7 +99,7 @@ class Controller_Admin extends \cms\Controller_CMS {
 			Page::deactivate_page($page_id);
 		}
 		
-		\Fuel\Core\Response::redirect($return_path);
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path.$return_path);
 	}
     
     public function before()
@@ -249,7 +249,7 @@ class Controller_Admin extends \cms\Controller_CMS {
 			Page::delete_page($page_id);
 		}
 		
-		\Fuel\Core\Response::redirect($return_path);
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path.$return_path);
 	}
 
     public function special_field_operation($object, $field_name, $value_sets)
