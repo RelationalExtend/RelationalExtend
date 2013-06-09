@@ -55,6 +55,52 @@ class Controller_Admin extends \cms\Controller_CMS {
 
         return 0;
     }
+	
+	private function bulk_delete($ids, $return_path = null)
+	{
+		$pages = "<ul>";
+		$ids_url = "";
+		
+		foreach($ids as $page_id)
+		{
+			$page_data = Page::get_any_page_by_id($page_id);
+			
+			$pages.="<li>".$page_data[0]["page_title"]."</li>";
+			$ids_url.="$page_id,";
+		}
+		
+		$pages .= "</ul>";
+		$ids_url = rtrim($ids_url, ",");
+		
+		$url_return_path = rawurlencode($return_path);
+		
+		$this->build_admin_interface(
+            $this->build_confirm_message(
+            	"Are you sure you want to delete these pages?<br/>$pages",
+            	\Fuel\Core\Uri::base().$this->controller_path."bulkdelete/$ids_url/?return=$url_return_path"
+			)
+        );
+	}
+	
+	private function bulk_activate($ids, $return_path = null)
+	{
+		foreach($ids as $page_id)
+		{
+			Page::activate_page($page_id);
+		}
+		
+		\Fuel\Core\Response::redirect($return_path);
+	}
+	
+	private function bulk_deactivate($ids, $return_path = null)
+	{
+		foreach($ids as $page_id)
+		{
+			Page::deactivate_page($page_id);
+		}
+		
+		\Fuel\Core\Response::redirect($return_path);
+	}
     
     public function before()
     {
@@ -173,21 +219,37 @@ class Controller_Admin extends \cms\Controller_CMS {
 	{
 		$selected_ids = $this->get_selected_checkboxes();
 		$action = $this->get_selected_bulk_action();
+		$return_path = $this->get_form_return_path();
 		
 		switch($action)
 		{
 			case self::BULK_DELETE:
-				// Todo: Bulk logic
+				$this->bulk_delete($selected_ids, $return_path);
 				break;
 			case self::BULK_ACTIVATE:
-				// Todo: Bulk logic
+				$this->bulk_activate($selected_ids, $return_path);
 				break;
 			case self::BULK_DEACTIVATE:
-				// Todo: Bulk logic
+				$this->bulk_deactivate($selected_ids, $return_path);
 				break;
 		}
+	}
+	
+	public function action_bulkdelete($ids)
+	{
+		$return_path = \Fuel\Core\Input::get("return", null);
 		
-		parent::action_bulkactions();
+		if($return_path == null)
+			$return_path = Uri::base().$this->controller_path;
+		
+		$ids_array = explode(",", $ids);
+		
+		foreach($ids_array as $page_id)
+		{
+			Page::delete_page($page_id);
+		}
+		
+		\Fuel\Core\Response::redirect($return_path);
 	}
 
     public function special_field_operation($object, $field_name, $value_sets)

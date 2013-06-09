@@ -251,7 +251,7 @@ class ObjectModel_TabularView {
             foreach($this->record_objects as $record)
             {
                 $edit_button = AdminHelpers::build_bootstrap_button($this->controller_path,
-                    "edit/".$this->table_name."/".$record->id_field."/".$this->return_path, "Edit");
+                    "edit/".$this->table_name."/".$record->id_field."/", "Edit");
                 $delete_button = AdminHelpers::build_bootstrap_button($this->controller_path,
                     "delete/".$this->table_name."/".$record->id_field, "Delete");
 
@@ -284,7 +284,7 @@ class ObjectModel_TabularView {
                 }
             }
 
-            $this->add_button = AdminHelpers::build_bootstrap_button($this->controller_path, "edit/".$this->table_name."/0/".$this->return_path, "Add new");
+            $this->add_button = AdminHelpers::build_bootstrap_button($this->controller_path, "edit/".$this->table_name."/0/", "Add new");
 
             if($this->add_button_visible)
                 $this->bottom_buttons = array($this->add_button);

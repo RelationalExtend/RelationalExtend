@@ -588,6 +588,38 @@ class Controller_Admin extends Controller_Template {
 		return Input::post("submit", null);
 	}
 	
+	/**
+	 * Gets the return path, if it exists in a post
+	 * 
+	 * @return action_name
+	 */
+	
+	protected function get_form_return_path()
+	{
+		return Input::post("return_path", null);
+	}
+	
+	/**
+	 * Build a confirmation message
+	 * 
+	 * @return view
+	 */
+	
+	protected function build_confirm_message($message, $confirm_url)
+	{
+		$url_from = rtrim($this->get_referring_url(), "/")."/";
+        $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
+		
+		$url_to = rtrim($confirm_url, "/");
+        $url_to = str_replace(Uri::base().$this->controller_path, "", $url_to);
+
+        $btn_yes = $this->build_bootstrap_button($url_to, "Yes");
+        $btn_no = $this->build_bootstrap_button($url_from, "No");
+
+        return View::forge("admin/partials/default-confirm", 
+        	array("message" => $message,"buttons" => array($btn_yes, $btn_no)));
+	}
+	
 
     /**
      * The first function to be executed before the controller is executed fully
@@ -787,7 +819,7 @@ class Controller_Admin extends Controller_Template {
 		
         // Default delete interface
 
-        $url_from = $this->get_referring_url();
+        $url_from = rtrim($this->get_referring_url(), "/")."/";
 
         $url_from = str_replace(Uri::base().$this->controller_path, "", $url_from);
 
