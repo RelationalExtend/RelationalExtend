@@ -274,11 +274,12 @@ class Controller_Admin extends Controller_Template {
 
      	if($this->admin_users_function){
             $links[self::MENU_USERS] = $this->build_menu_item("Users", $this->default_admin_extension_path.self::MENU_USERS);
-            
-            if(Auth::check()){
-            	$links[self::MENU_LOGOUT] = $this->build_menu_item("Logout", $this->logout_path);
-            }
-         }
+     	}
+		
+		if(Auth::check()){
+        	$links[self::MENU_LOGOUT] = $this->build_menu_item("Logout", $this->logout_path);
+        }
+		
         return $links;
     }
 
