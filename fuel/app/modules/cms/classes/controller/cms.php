@@ -275,6 +275,214 @@ class Controller_CMS extends \Controller_Admin {
 	}
 	
 	/**
+	 * Display roles
+	 * 
+	 * @return void
+	 */
+	
+	public function action_roles($status = "")
+	{
+		$this->check_access_level_admin();
+		
+		$messages = array();
+
+        if($status == "successfulcreate")
+		{
+			$messages[] = "User created successfully";
+		}
+		else if($status == "nosuccessfulcreate")
+		{
+			$messages[] = "User could not be created";
+		}
+		else if($status == "passwordchangesuccess")
+		{
+			$messages[] = "Password change successful";
+		}
+		else if($status == "successfuldelete")
+		{
+			$messages[] = "Delete successful";
+		}
+		else if($status == "nosuccessfuldelete")
+		{
+			$messages[] = "No success in delete";
+		}
+		else if($status == "successfulchange")
+		{
+			$messages[] = "Change successful";
+		}
+		else if($status == "nosuccessfulchange")
+		{
+			$messages[] = "No success in change";
+		}
+		
+		$roles = \Permissions::get_roles();
+		
+		foreach($roles as $role)
+		{
+			$role->delete_button = \AdminHelpers::build_bootstrap_button($this->controller_path,
+				"deleterole/".$role->id, "Delete");
+		}
+
+        $this->build_admin_interface(
+            \Fuel\Core\View::forge("admin/roles", array("page_title" => "Roles",
+                "page_title_content" => "Manage roles", "roles" => $roles,
+                "controller_path" => $this->controller_path, "messages" => $messages))
+        );
+	}
+	
+	/**
+	 * Create a role
+	 * 
+	 * @return void
+	 */
+	
+	public function action_createrole()
+	{
+		$this->check_access_level_admin();
+		$role_name = \Fuel\Core\Input::post("role_name", null);
+		
+		if($role_name != null)
+			\Permissions::create_role($role_name);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."roles");
+	}
+	
+	/**
+	 * Update a role
+	 * 
+	 * @param $role_id
+	 * @return void
+	 */
+	
+	public function action_updaterole($role_id)
+	{
+		$this->check_access_level_admin();
+		$new_name = \Fuel\Core\Input::post("new_name", null);
+		
+		if($new_name != null)
+			\Permissions::update_role($role_id, $new_name);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."roles");
+	}
+	
+	/**
+	 * Delete a role
+	 * 
+	 * @param $role_id
+	 * @return void
+	 */
+	
+	public function action_deleterole($role_id)
+	{
+		$this->check_access_level_admin();
+		
+		$this->build_admin_interface(
+            $this->build_confirm_message("Sure you want to delete this role?",
+            	\Fuel\Core\Uri::base().$this->controller_path."dodeleterole/?roleid=$role_id")
+        );
+	}
+	
+	/**
+	 * Confirm delete of role
+	 * 
+	 * @return void
+	 */
+	
+	public function action_dodeleterole()
+	{
+		$this->check_access_level_admin();
+		$role_id = \Fuel\Core\Input::get("roleid", 0);
+		
+		// Do delete
+		
+		if($role_id > 0)
+			\Permissions::delete_role($role_id);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."roles");
+	}
+	
+	/**
+	 * Display permissions
+	 * 
+	 * @return void
+	 */
+	
+	public function action_permissions()
+	{
+		$this->check_access_level_admin();
+		$permissions = \Permissions::get_permissions();
+	}
+	
+	/**
+	 * Create a permission
+	 * 
+	 * @return void
+	 */
+	
+	public function action_createpermissions()
+	{
+		$this->check_access_level_admin();
+	}
+	
+	/**
+	 * Update a permission
+	 * 
+	 * @param $permission_id
+	 * @return void
+	 */
+	
+	public function action_updatepermission($permission_id)
+	{
+		$this->check_access_level_admin();
+	}
+	
+	/**
+	 * Delete a permission
+	 * 
+	 * @param $permission_id
+	 * @return void
+	 */
+	
+	public function action_deletepermission($permission_id)
+	{
+		$this->check_access_level_admin();
+	}
+	
+	/**
+	 * Confirm delete of role
+	 * 
+	 * @return void
+	 */
+	
+	public function action_dodeletepermission()
+	{
+		$this->check_access_level_admin();
+		$permission_id = \Fuel\Core\Input::get("permissionid", 0);
+	}
+	
+	/**
+	 * Show user roles
+	 * 
+	 * @return void
+	 */
+	
+	public function action_userroles()
+	{
+		$this->check_access_level_admin();
+	}
+	
+	/**
+	 * Show roles and permissions
+	 * 
+	 * @return void
+	 */
+	
+	public function action_rolespermissions()
+	{
+		$this->check_access_level_admin();
+	}
+	
+	/**
 	 * Site settings
 	 * 
 	 * @param $extension_id
