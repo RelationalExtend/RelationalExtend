@@ -27,10 +27,49 @@ class Controller_CMS extends \Controller_Admin {
 	}
 	
 	/**
+	 * Builds the navigation system for the users page tabs
+	 * 
+	 * @param $users_active
+	 * @param $roles_active
+	 * @param $permissions_active
+	 * @param $user_roles_active
+	 * @param $role_permissions_active
+	 */
+	
+	private function build_user_nav_menu_vars($users_active, $roles_active, $permissions_active,
+		$user_roles_active, $role_permissions_active)
+    {
+        return array(
+            "users_class" => $users_active ? "class='active'" : "",
+            "roles_class" => $roles_active ? "class='active'" : "",
+            "permissions_class" => $permissions_active ? "class='active'" : "",
+            "user_roles_class" => $user_roles_active ? "class='active'" : "",
+            "role_permissions_class" => $role_permissions_active ? "class='active'" : "",
+            "users_link" => \Fuel\Core\Uri::base().$this->controller_path."users",
+            "roles_link" => \Fuel\Core\Uri::base().$this->controller_path."roles",
+            "permissions_link" => \Fuel\Core\Uri::base().$this->controller_path."permissions",
+            "user_roles_link" => \Fuel\Core\Uri::base().$this->controller_path."userroles",
+            "role_permissions_link" => \Fuel\Core\Uri::base().$this->controller_path."rolespermissions",
+        );
+    }
+	
+	/**
+	 * Enforce permission for current user
+	 * 
+	 * @param $permission_slug
+	 */
+	
+	protected function enforce_permission($permission_slug)
+	{
+		if(!\Permissions::is_user_permitted($this->user_id, $permission_slug))
+			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."unauthorizedaccess");
+	}
+	
+	/**
 	 * Controller initialization
 	 */
 
-    public function before()
+   	public function before()
     {
     	\Config::load("cms::msh", "msh");
     	$this->msh_site = \Config::get("msh.msh_status");
@@ -181,9 +220,13 @@ class Controller_CMS extends \Controller_Admin {
 			$messages[] = "No success in change";
 		}
 		
+		$nav_interface = \Fuel\Core\View::forge("admin/user-tabs",
+			$this->build_user_nav_menu_vars(true, false, false, false, false));
+		
 		$users = $this->get_all_users();
 
         $this->build_admin_interface(
+        	$nav_interface.
             \Fuel\Core\View::forge("admin/partials/users", array("page_title" => "Users",
                 "page_title_content" => "Manage the site's Users", "messages" => $messages,
                 "users" => $users, "controller_path" => $this->controller_path))
@@ -288,15 +331,11 @@ class Controller_CMS extends \Controller_Admin {
 
         if($status == "successfulcreate")
 		{
-			$messages[] = "User created successfully";
+			$messages[] = "Role created successfully";
 		}
 		else if($status == "nosuccessfulcreate")
 		{
-			$messages[] = "User could not be created";
-		}
-		else if($status == "passwordchangesuccess")
-		{
-			$messages[] = "Password change successful";
+			$messages[] = "Role could not be created";
 		}
 		else if($status == "successfuldelete")
 		{
@@ -315,6 +354,9 @@ class Controller_CMS extends \Controller_Admin {
 			$messages[] = "No success in change";
 		}
 		
+		$nav_interface = \Fuel\Core\View::forge("admin/user-tabs",
+			$this->build_user_nav_menu_vars(false, true, false, false, false));
+		
 		$roles = \Permissions::get_roles();
 		
 		foreach($roles as $role)
@@ -324,6 +366,7 @@ class Controller_CMS extends \Controller_Admin {
 		}
 
         $this->build_admin_interface(
+        	$nav_interface.
             \Fuel\Core\View::forge("admin/roles", array("page_title" => "Roles",
                 "page_title_content" => "Manage roles", "roles" => $roles,
                 "controller_path" => $this->controller_path, "messages" => $messages))
@@ -407,10 +450,54 @@ class Controller_CMS extends \Controller_Admin {
 	 * @return void
 	 */
 	
-	public function action_permissions()
+	public function action_permissions($status = "")
 	{
 		$this->check_access_level_admin();
+		
+		$messages = array();
+
+        if($status == "successfulcreate")
+		{
+			$messages[] = "Permission created successfully";
+		}
+		else if($status == "nosuccessfulcreate")
+		{
+			$messages[] = "Permission could not be created";
+		}
+		else if($status == "successfuldelete")
+		{
+			$messages[] = "Delete successful";
+		}
+		else if($status == "nosuccessfuldelete")
+		{
+			$messages[] = "No success in delete";
+		}
+		else if($status == "successfulchange")
+		{
+			$messages[] = "Change successful";
+		}
+		else if($status == "nosuccessfulchange")
+		{
+			$messages[] = "No success in change";
+		}
+		
+		$nav_interface = \Fuel\Core\View::forge("admin/user-tabs",
+			$this->build_user_nav_menu_vars(false, false, true, false, false));
+		
 		$permissions = \Permissions::get_permissions();
+		
+		foreach($permissions as $permission)
+		{
+			$permission->delete_button = \AdminHelpers::build_bootstrap_button($this->controller_path,
+				"deletepermission/".$permission->id, "Delete");
+		}
+
+        $this->build_admin_interface(
+        	$nav_interface.
+            \Fuel\Core\View::forge("admin/permissions", array("page_title" => "Permissions",
+                "page_title_content" => "Manage permissions", "permissions" => $permissions,
+                "controller_path" => $this->controller_path, "messages" => $messages))
+        );
 	}
 	
 	/**
@@ -419,9 +506,15 @@ class Controller_CMS extends \Controller_Admin {
 	 * @return void
 	 */
 	
-	public function action_createpermissions()
+	public function action_createpermission()
 	{
 		$this->check_access_level_admin();
+		$permission_name = \Fuel\Core\Input::post("permission_name", null);
+		
+		if($permission_name != null)
+			\Permissions::create_permission($permission_name);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."permissions");
 	}
 	
 	/**
@@ -434,6 +527,12 @@ class Controller_CMS extends \Controller_Admin {
 	public function action_updatepermission($permission_id)
 	{
 		$this->check_access_level_admin();
+		$new_name = \Fuel\Core\Input::post("new_name", null);
+		
+		if($new_name != null)
+			\Permissions::update_permission($permission_id, $new_name);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."permissions");
 	}
 	
 	/**
@@ -446,6 +545,11 @@ class Controller_CMS extends \Controller_Admin {
 	public function action_deletepermission($permission_id)
 	{
 		$this->check_access_level_admin();
+		
+		$this->build_admin_interface(
+            $this->build_confirm_message("Sure you want to delete this permission?",
+            	\Fuel\Core\Uri::base().$this->controller_path."dodeletepermission/?permissionid=$permission_id")
+        );
 	}
 	
 	/**
@@ -458,6 +562,13 @@ class Controller_CMS extends \Controller_Admin {
 	{
 		$this->check_access_level_admin();
 		$permission_id = \Fuel\Core\Input::get("permissionid", 0);
+		
+		// Do delete
+		
+		if($permission_id > 0)
+			\Permissions::delete_permission($permission_id);
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."permissions");
 	}
 	
 	/**
@@ -466,9 +577,60 @@ class Controller_CMS extends \Controller_Admin {
 	 * @return void
 	 */
 	
-	public function action_userroles()
+	public function action_userroles($user_id = 0)
 	{
 		$this->check_access_level_admin();
+		
+		// Get users
+		$users = $this->get_all_users();
+		$user = $users[0];
+		$roles = \Permissions::get_roles();
+		
+		if($user_id > 0)
+		{
+			$user = \Fuel\Core\DB::select("*")->from("users")
+				->where("id", "=", $user_id)
+				->as_object()->execute();
+			
+			if(count($user) < 1)
+				throw new \Exception_CMS("User ID $user_id does not exist");
+				
+			$user = $user[0];
+		}
+		
+		$role_ids = array();
+		
+		// Get roles array
+		if(isset($user->id))
+		{
+			$roles_for_user = \Permissions::get_user_roles($user->id);
+			
+			foreach($roles_for_user as $role_for_user)
+			{
+				if($role_for_user->active == 1)
+					$role_ids[] = $role_for_user->role_id;
+			}
+		}
+		
+		// Tabs
+		$nav_interface = \Fuel\Core\View::forge("admin/user-tabs",
+			$this->build_user_nav_menu_vars(false, false, false, true, false));
+		
+		// Sidebar
+		$user_roles_sidebar = \Fuel\Core\View::forge("admin/user-roles-sidebar",
+			array("users" => $users, "controller_path" => \Fuel\Core\Uri::base().$this->controller_path));
+			
+		// Content
+		$user_roles_content = \Fuel\Core\View::forge("admin/user-roles-editor", 
+			array("roles" => $roles, "user" => $user, "controller_path" => $this->controller_path,
+				"assign_roles_url" => \Fuel\Core\Uri::base().$this->controller_path."assignroles",
+				"role_ids" => $role_ids));
+		
+		$this->build_admin_interface(
+			$nav_interface.
+			\Fuel\Core\View::forge("admin/user-roles", array("user_roles_sidebar" => $user_roles_sidebar,
+				"user_roles_content" => $user_roles_content))
+		);
 	}
 	
 	/**
@@ -477,9 +639,144 @@ class Controller_CMS extends \Controller_Admin {
 	 * @return void
 	 */
 	
-	public function action_rolespermissions()
+	public function action_rolespermissions($role_id = 0)
 	{
 		$this->check_access_level_admin();
+		
+		// Get roles
+		$roles = \Permissions::get_roles();
+		$permissions = \Permissions::get_permissions();
+		$role = array();
+		
+		if($role_id > 0)
+		{
+			$role = \Fuel\Core\DB::select("*")->from(\Permissions::TABLE_ROLES)
+				->where("id", "=", $role_id)
+				->as_object()->execute();
+			
+			if(count($role) < 1)
+				throw new \Exception_CMS("Role ID $role_id does not exist");
+				
+			$role = $role[0];
+		}
+		else
+		{
+			if(count($roles) > 0)
+				$role = $roles[0];
+		}
+		
+		$permission_ids = array();
+		
+		if(isset($role->id))
+		{
+			$permissions_for_role = \Permissions::get_roles_permissions($role->id);
+			
+			foreach($permissions_for_role as $permission_for_role)
+			{
+				if($permission_for_role->active == 1)	
+					$permission_ids[] = $permission_for_role->permission_id;
+			}		
+		}
+		
+		// Tabs
+		$nav_interface = \Fuel\Core\View::forge("admin/user-tabs",
+			$this->build_user_nav_menu_vars(false, false, false, false, true));
+		
+		// Sidebar
+		$roles_permissions_sidebar = \Fuel\Core\View::forge("admin/roles-permissions-sidebar",
+			array("roles" => $roles, "controller_path" => \Fuel\Core\Uri::base().$this->controller_path));
+			
+		// Content
+		$roles_permissions_content = \Fuel\Core\View::forge("admin/roles-permissions-editor", 
+			array("permissions" => $permissions, "role" => $role, "controller_path" => $this->controller_path,
+				"assign_permissions_url" => \Fuel\Core\Uri::base().$this->controller_path."assignpermissions",
+				"permission_ids" => $permission_ids));
+		
+		$this->build_admin_interface(
+			$nav_interface.
+			\Fuel\Core\View::forge("admin/roles-permissions", array("roles_permissions_sidebar" => $roles_permissions_sidebar,
+				"roles_permissions_content" => $roles_permissions_content))
+		);
+	}
+
+	/**
+	 * Assign roles to a user
+	 * 
+	 * @return void
+	 */
+
+	public function action_assignroles()
+	{
+		$user_id = \Fuel\Core\Input::post("user_id", 0);
+		
+		if(intval($user_id) > 0)
+		{
+			$roles = \Fuel\Core\Input::post("chkroles", null);
+			$all_roles = \Permissions::get_roles();
+			
+			if(is_array($roles))
+			{	
+				\Permissions::assign_user_roles($user_id, $roles);
+				
+				foreach($all_roles as $role)
+				{
+					if(!in_array($role->id, $roles))
+						\Permissions::deassign_user_role($user_id, $role->id);
+				}
+			}
+			else 
+			{
+				$roles = array();
+				
+				foreach($all_roles as $role)
+				{
+					if(!in_array($role->id, $roles))
+						\Permissions::deassign_user_role($user_id, $role->id);
+				}
+			}
+		}
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."userroles/$user_id");
+	}
+	
+	/**
+	 * Assign permissions to a role
+	 * 
+	 * @return void
+	 */
+	
+	public function action_assignpermissions()
+	{
+		$role_id = \Fuel\Core\Input::post("role_id", 0);
+		
+		if(intval($role_id) > 0)
+		{
+			$permissions = \Fuel\Core\Input::post("chkpermissions", null);
+			$all_permissions = \Permissions::get_permissions();
+			
+			if(is_array($permissions))
+			{
+				\Permissions::assign_role_permissions($role_id, $permissions);
+				
+				foreach($all_permissions as $permission)
+				{
+					if(!in_array($permission->id, $permissions))
+						\Permissions::deassign_role_permission($role_id, $permission->id);
+				}
+			}
+			else 
+			{
+				$permissions = array();
+			
+				foreach($all_permissions as $permission)
+				{
+					if(!in_array($permission->id, $permissions))
+						\Permissions::deassign_role_permission($role_id, $permission->id);
+				}
+			}
+		}
+		
+		\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."rolespermissions/$role_id");
 	}
 	
 	/**

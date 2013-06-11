@@ -198,11 +198,17 @@
 		$roles_array = array();
 		
 		foreach($roles as $role)
-			$roles_array[] = $role->id;
+			$roles_array[] = $role->role_id;
 		
-		$roles_not_in = DB::select("*")->from(self::TABLE_ROLES)
-			->where("id", "not in", $roles_array)
-			->as_object()->execute();
+		$roles_not_in = array();
+		
+		if(count($roles_array) > 0)
+			$roles_not_in = DB::select("*")->from(self::TABLE_ROLES)
+				->where("id", "not in", $roles_array)
+				->as_object()->execute();
+		else
+			$roles_not_in = DB::select("*")->from(self::TABLE_ROLES)
+				->as_object()->execute();
 			
 		foreach($roles_not_in as $role_not_in)
 		{
@@ -227,11 +233,17 @@
 		$permissions_array = array();
 		
 		foreach($permissions as $permission)
-			$permissions_array[] = $permission->id;
+			$permissions_array[] = $permission->permission_id;
 		
-		$permissions_not_in = DB::select("*")->from(self::TABLE_PERMISSIONS)
-			->where("id", "not in", $permissions_array)
-			->as_object()->execute();
+		$permissions_not_in = array();
+		
+		if(count($permissions_array) > 0)
+			$permissions_not_in = DB::select("*")->from(self::TABLE_PERMISSIONS)
+				->where("id", "not in", $permissions_array)
+				->as_object()->execute();
+		else
+			$permissions_not_in = DB::select("*")->from(self::TABLE_PERMISSIONS)
+				->as_object()->execute();
 			
 		foreach($permissions_not_in as $permission_not_in)
 		{
@@ -296,18 +308,10 @@
 	public static function assign_user_roles($user_id, $role_ids = array())
 	{
 		self::build_roles_for_user($user_id);
-		$roles = self::get_user_roles($user_id);
-		
-		foreach($roles as $role)
+				
+		foreach($role_ids as $role_id)
 		{
-			if(in_array($role->id, $role_ids))
-			{
-				self::assign_user_role($user_id, $role->id);
-			}
-			else 
-			{
-				self::deassign_user_role($user_id, $role->id);
-			}
+			self::assign_user_role($user_id, $role_id);
 		}
 	}
 	
@@ -344,7 +348,7 @@
 	{
 		$result = DB::update(self::TABLE_ROLES_PERMISSIONS)
 			->set(array(
-				"active" => 1
+				"active" => 0
 			))
 			->where("role_id", "=", $role_id)
 			->and_where("permission_id", "=", $permission_id)
@@ -363,18 +367,10 @@
 	public static function assign_role_permissions($role_id, $permission_ids = array())
 	{
 		self::build_permissions_for_role($role_id);
-		$permissions = self::get_roles_permissions($role_id);
 		
-		foreach($permissions as $permission)
+		foreach($permission_ids as $permission_id)
 		{
-			if(in_array($permission->id, $permission_ids))
-			{
-				self::assign_role_permission($role_id, $permission->id);
-			}
-			else 
-			{
-				self::deassign_role_permission($role_id, $permission->id);
-			}
+			self::assign_role_permission($role_id, $permission_id);
 		}
 	}
 	
@@ -444,7 +440,7 @@
 	{
 		$permission = DB::select("*")->from(self::TABLE_PERMISSIONS)
 			->where("permission_slug", "=", $permission_slug)
-			->execute()->as_array();
+			->as_object()->execute();
 		
 		if(count($permission) < 1)
 			throw new Exception_CMS("The permission $permission_slug does not exist");
@@ -455,6 +451,9 @@
 			->join(self::TABLE_ROLES_PERMISSIONS, 'LEFT')
 			->on(self::TABLE_USER_ROLES.".role_id", "=", self::TABLE_ROLES_PERMISSIONS.".role_id")
 			->where(self::TABLE_USER_ROLES.".user_id", "=", $user_id)
+			->and_where(self::TABLE_ROLES_PERMISSIONS.".permission_id", "=", $permission_id)
+			->and_where(self::TABLE_USER_ROLES.".active", "=", 1)
+			->and_where(self::TABLE_ROLES_PERMISSIONS.".active", "=", 1)
 			->as_object()->execute();
 			
 		return (count($role) > 0);

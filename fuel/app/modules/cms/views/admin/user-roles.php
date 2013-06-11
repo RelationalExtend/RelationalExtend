@@ -13,7 +13,7 @@
           	<hr/>
           	<p>Assign roles to users</p>
           	
-          	<?php echo($roles_editor); ?>
+          	<?php echo($user_roles_content); ?>
       	</div>
     </div>
 	

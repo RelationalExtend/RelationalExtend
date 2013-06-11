@@ -10,24 +10,24 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width:20%;">Role</th>
+                <th style="width:20%;">Permission</th>
                 <th style="width:20%;">Slug</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
         <tbody>
-<?php foreach($roles as $role) { ?>
+<?php foreach($permissions as $permission) { ?>
             <tr>
-                <td><?php echo($role->role); ?></td>
-                <td><?php echo($role->role_slug); ?></td>
+                <td><?php echo($permission->permission); ?></td>
+                <td><?php echo($permission->permission_slug); ?></td>
                 <td>
-                	<form action="<?php echo(Uri::base().$controller_path."updatepassword/".$user->username); ?>" method="post" class="form-inline">
+                	<form action="<?php echo(Uri::base().$controller_path."updatepermission/".$permission->id); ?>" method="post" class="form-inline">
                 		<input type="text" placeholder="New name..." name="new_name" />
                 		<button type="submit" class="btn">Change name</button>
                 	</form>
             	</td>
-                <td><?php echo(isset($user->delete_button) ? AdminHelpers::bootstrap_buttons(array($user->delete_button)) : "&nbsp;")?></td>
+                <td><?php echo(AdminHelpers::bootstrap_buttons(array($permission->delete_button)))?></td>
             </tr>
 <?php } ?>
         </tbody>
@@ -35,21 +35,11 @@
 
     <hr/>
     
-    <form action="<?php echo(Uri::base().$controller_path."createuser"); ?>" method="post">
+    <form action="<?php echo(Uri::base().$controller_path."createpermission"); ?>" method="post">
 	    <fieldset>
-		    <legend>Create a new user</legend>
-		    <label>User name</label>
-		    <input type="text" placeholder="User name..." name="user_name" />
-		    <label>Email address</label>
-		    <input type="text" placeholder="Email address..." name="email_address" />
-		    <label>Password</label>
-		    <input type="password" placeholder="Password..." name="password" />
-		    <label>Group</label>
-		    <select name="user_group">
-		    	<option value="100">Super Admin</option>
-		    	<option value="101">Developer</option>
-		    	<option value="102">Content Manager</option>
-		    </select>
+		    <legend>Create a new permission</legend>
+		    <label>Permission name</label>
+		    <input type="text" placeholder="Permission name..." name="permission_name" />
 		    <p><button type="submit" class="btn">Create</button></p>
 	    </fieldset>
     </form>

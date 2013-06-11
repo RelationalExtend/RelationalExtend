@@ -13,7 +13,7 @@
           	<hr/>
           	<p>Assign permissions to roles</p>
           	
-          	<?php echo($permissions_editor); ?>
+          	<?php echo($roles_permissions_content); ?>
       	</div>
     </div>
 	
