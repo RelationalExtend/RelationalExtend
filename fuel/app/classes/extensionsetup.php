@@ -72,6 +72,18 @@ class ExtensionSetup {
                 ))->execute();
             }
         }
+
+		// Add extension permissions to the database
+		if(is_array($extension_data->{ExtensionInfo::SEGMENT_EXTENSION_PERMISSIONS}))
+		{
+			$permissions = $extension_data->{ExtensionInfo::SEGMENT_EXTENSION_PERMISSIONS};
+			
+			foreach($permissions as $permission)
+			{
+				if(trim($permission) != "")
+					Permissions::create_permission($permission);
+			}
+		}
     }
 
     /**

@@ -13,6 +13,7 @@ class ExtensionInfo {
     const SEGMENT_EXTENSION_DESCRIPTION = "extension_description";
     const SEGMENT_EXTENSION_FOLDER = "extension_folder";
     const SEGMENT_EXTENSION_ACTIVE = "extension_active";
+	const SEGMENT_EXTENSION_PERMISSIONS = "extension_permissions";
 
     protected $extension_data;
 
@@ -44,8 +45,13 @@ class ExtensionInfo {
      * @param string $version
      * @return void
      */
-    protected function build_extension_data($name, $description, $install_folder, $version = "1.0")
+    protected function build_extension_data($name, $description, $install_folder, $version = "1.0", $permissions = array())
     {
+    	// Validate permissions
+    	if(!is_array($permissions))
+			throw new Exception_Extension("Permissions specified are not an array");
+    	
+		// Build extension data
         $ex_data = &$this->extension_data;
 
         $slug = Utility::slugify($name);
@@ -55,5 +61,6 @@ class ExtensionInfo {
         $ex_data->{self::SEGMENT_EXTENSION_VERSION} = $version;
         $ex_data->{self::SEGMENT_EXTENSION_FOLDER} = $install_folder;
         $ex_data->{self::SEGMENT_EXTENSION_DESCRIPTION} = $description;
+		$ex_data->{self::SEGMENT_EXTENSION_PERMISSIONS} = $permissions;
     }
 }

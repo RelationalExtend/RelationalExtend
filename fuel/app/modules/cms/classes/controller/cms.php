@@ -59,9 +59,14 @@ class Controller_CMS extends \Controller_Admin {
 	 * @param $permission_slug
 	 */
 	
-	protected function enforce_permission($permission_slug)
+	protected function enforce_permission($permission_slug, $force_slug = true)
 	{
-		if(!\Permissions::is_user_permitted($this->user_id, $permission_slug))
+		$permission_slugified = $permission_slug;
+		
+		if($force_slug)
+			$permission_slugified = \Utility::slugify($permission_slugified);
+		
+		if(!\Permissions::is_user_permitted($this->user_id, $permission_slugified))
 			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."unauthorizedaccess");
 	}
 	

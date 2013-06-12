@@ -58,6 +58,10 @@ class Controller_Admin extends \cms\Controller_CMS {
 	
 	private function bulk_delete($ids, $return_path = null)
 	{
+		// Enforce permissions
+		$this->enforce_permission(Page_Info::PERMISSION_DELETE_PAGE);
+		
+		// Delete
 		$pages = "<ul>";
 		$ids_url = "";
 		
@@ -84,6 +88,10 @@ class Controller_Admin extends \cms\Controller_CMS {
 	
 	private function bulk_activate($ids, $return_path = null)
 	{
+		// Enforce permissions
+		$this->enforce_permission(Page_Info::PERMISSION_EDIT_PAGE);
+		
+		// Activation
 		foreach($ids as $page_id)
 		{
 			Page::activate_page($page_id);
@@ -94,6 +102,10 @@ class Controller_Admin extends \cms\Controller_CMS {
 	
 	private function bulk_deactivate($ids, $return_path = null)
 	{
+		// Enforce permissions
+		$this->enforce_permission(Page_Info::PERMISSION_EDIT_PAGE);
+		
+		// Deactivation
 		foreach($ids as $page_id)
 		{
 			Page::deactivate_page($page_id);
@@ -147,6 +159,30 @@ class Controller_Admin extends \cms\Controller_CMS {
             $main_interface
         );
     }
+
+	public function action_edit($table, $record_id = 0, $success_string = "")
+	{
+		// Enforce permissions
+		if($record_id == 0)
+		{
+			// New record
+			$this->enforce_permission(Page_Info::PERMISSION_CREATE_PAGE);
+		}
+		else 
+		{
+			// Edit record
+			$this->enforce_permission(Page_Info::PERMISSION_EDIT_PAGE);
+		}
+		parent::action_edit($table, $record_id, $success_string);
+	}
+	
+	public function action_delete($table, $record_id, $confirm = 0)
+	{
+		// Enforce permissions
+		$this->enforce_permission(Page_Info::PERMISSION_DELETE_PAGE);
+		
+		parent::action_delete($table, $record_id, $confirm = 0);
+	}
 
     public function action_media($record_id = 0, $page_number = 1)
     {
@@ -202,7 +238,11 @@ class Controller_Admin extends \cms\Controller_CMS {
 
     public function action_addmedia($record_id, $media_id, $page_number)
     {
+        // Enforce permissions
+        $this->enforce_permission(Page_Info::PERMISSION_EDIT_PAGE);
+		
         // Add media to this page or to all pages
+        
         if($this->media_active)
         {
             $this->tag_page_media($record_id, $media_id);
@@ -237,6 +277,10 @@ class Controller_Admin extends \cms\Controller_CMS {
 	
 	public function action_bulkdelete($ids)
 	{
+		// Enforce permissions
+		$this->enforce_permission(Page_Info::PERMISSION_DELETE_PAGE);
+		
+		// Perform bulk delete
 		$return_path = \Fuel\Core\Input::get("return", null);
 		
 		if($return_path == null)
