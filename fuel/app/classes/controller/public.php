@@ -8,7 +8,7 @@
 
 class Controller_Public extends Controller {
 
-    protected $controller_path = "public/";
+    protected $controller_path = "";
 
     // Protected variables
 
@@ -80,7 +80,7 @@ class Controller_Public extends Controller {
      */
 
     protected function build_frontend_ui_form_view($page_title, $page_content, $table_slug, $form_action,
-        $record_id = 0, $return_path = "")
+        $record_id = 0, $return_path = "", $buttons = array("Submit"), $form_class = "container")
     {
         // Record view data here
 
@@ -98,7 +98,8 @@ class Controller_Public extends Controller {
                     "form_action" => Uri::base().$this->controller_path.$form_view->form_action, "object" => $table_slug,
                     "record" => $form_view->get_records(), "form_values" => $form_view->preset_form_fields,
                     "div_form_class" => $form_view->div_form_class, "div_content_class" => $form_view->div_content_class,
-                    "div_container_class" => $form_view->div_container_class, "return_path" => $form_view->return_path));
+                    "div_container_class" => $form_view->div_container_class, "return_path" => $form_view->return_path,
+					"buttons" => $buttons, "form_class" => $form_class));
 
         return $view;
     }
