@@ -14,6 +14,7 @@ class Controller_CMS extends \Controller_Admin {
     protected $default_admin_extension_path = "cms/cms/";
     
     protected $is_abstract_controller = false;
+	protected $custom_dashboard = false;
 	
 	/**
 	 * Gets all shortened URLs
@@ -90,6 +91,12 @@ class Controller_CMS extends \Controller_Admin {
 			$this->check_access_level_content();
 			$this->build_admin_interface(
             	\Fuel\Core\View::forge("admin/msh-dashboard")
+	        );
+		}
+		else if($this->custom_dashboard) {
+			$this->check_access_level_content();
+			$this->build_admin_interface(
+            	\Fuel\Core\View::forge("admin/custom-dashboard")
 	        );
 		}
 		else 
