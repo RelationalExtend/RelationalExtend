@@ -83,21 +83,43 @@ class Controller_CMS extends \Controller_Admin {
         parent::before();
     }
 	
+	/**
+	 * MSH landing page action
+	 */
+	
+	public function admin_mshlanding()
+	{
+		$this->check_access_level_content();
+		$this->build_admin_interface(
+        	\Fuel\Core\View::forge("admin/msh-dashboard")
+        );
+	}
+	
+	/**
+	 * Custom landing page function
+	 */
+	
+	public function admin_customlanding()
+	{
+		$this->check_access_level_content();
+		$this->build_admin_interface(
+        	\Fuel\Core\View::forge("admin/custom-dashboard")
+        );
+	}
+	
+	/**
+	 * Landing page action override
+	 */
+	
 	public function action_index()
 	{
 		if($this->msh_site)
 		{
-			// Custom code
-			$this->check_access_level_content();
-			$this->build_admin_interface(
-            	\Fuel\Core\View::forge("admin/msh-dashboard")
-	        );
+			$this->admin_mshlanding();
 		}
-		else if($this->custom_dashboard) {
-			$this->check_access_level_content();
-			$this->build_admin_interface(
-            	\Fuel\Core\View::forge("admin/custom-dashboard")
-	        );
+		else if($this->custom_dashboard) 
+		{
+			$this->admin_customlanding();
 		}
 		else 
 		{
