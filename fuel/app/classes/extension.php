@@ -111,9 +111,7 @@ class Extension {
 
                 if(method_exists($extension_info_object, self::INFO_FUNCTION)) {
                     $meta_data = $extension_info_object->{self::INFO_FUNCTION}();
-                    $directory_name = array("extension_folder" => basename($extension));
-
-                    $extension_meta_data[basename($extension)] = array_merge($meta_data, $directory_name);
+                    $extension_meta_data[basename($extension)] = $meta_data;
                 }
             }
         }

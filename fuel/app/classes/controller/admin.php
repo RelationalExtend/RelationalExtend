@@ -1329,6 +1329,14 @@ class Controller_Admin extends Controller_Template {
 		}
 		
     	$this->check_access_level_developer();
+    	
+		$core_extensions = Extension::get_core_extensions();
+		
+		foreach($core_extensions as $core_extension) {
+            if(!Module::loaded(basename($core_extension))) {
+                CMSInit::load_extension(basename($core_extension));
+            }
+        }
 		
         $url_from = $this->get_referring_url();
 
