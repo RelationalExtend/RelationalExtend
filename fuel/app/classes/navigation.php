@@ -144,10 +144,10 @@ class Navigation {
 			{
 				$extension_folder = self::get_extension_folder_by_id($navigation_record->navigation_object_id);
 				
+				$extension_url = Uri::base()."$extension_folder/$extension_folder";
+				
 				if(CMSInit::is_extension_installed($extension_folder))
 				{
-					$extension_url = Uri::base()."$extension_folder/$extension_folder";
-				
 					$nav_url = Config::get("nav.".$extension_folder.".short_route", null);
 					
 					if($nav_url != null)
