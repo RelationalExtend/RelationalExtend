@@ -447,7 +447,7 @@
 		
 		$permission_id = $permission[0]->id;
 		
-		$role = DB::select("*")->from(self::TABLE_USER_ROLES)
+		$role = DB::select(DB::expr("COUNT(*) AS num_rows"))->from(self::TABLE_USER_ROLES)
 			->join(self::TABLE_ROLES_PERMISSIONS, 'LEFT')
 			->on(self::TABLE_USER_ROLES.".role_id", "=", self::TABLE_ROLES_PERMISSIONS.".role_id")
 			->where(self::TABLE_USER_ROLES.".user_id", "=", $user_id)
@@ -456,6 +456,6 @@
 			->and_where(self::TABLE_ROLES_PERMISSIONS.".active", "=", 1)
 			->as_object()->execute();
 			
-		return (count($role) > 0);
+		return ($role[0]->num_rows > 0);
 	}
  }
