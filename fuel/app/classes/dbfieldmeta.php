@@ -39,6 +39,24 @@ class DBFieldMeta {
 	// Custom control
 	
 	const CONTROL_CUSTOM = "custom";
+	
+	// Core controls array
+	
+	const CONTROL_ARRAY = array(
+		self::CONTROL_SIMPLE_TEXT => "Simple Text Box",
+		self::CONTROL_NUMERIC => "Numeric Box",
+		self::CONTROL_CALENDAR => "Calendar",
+		self::CONTROL_MULTI_TEXT => "Multiple Line Text Box",
+		self::CONTROL_RICH_EDIT => "Rich Text Editor",
+		self::CONTROL_LIST => "List Control",
+		self::CONTROL_TABULAR_LIST => "External Table List",
+		self::CONTROL_HIDDEN => "Hidden Field",
+		self::CONTROL_CHECKBOX => "Check Box",
+		self::CONTROL_MULTISELECT => "Multiple Option",
+		self::CONTROL_FILE => "File",
+	);
+	
+	// Field members
 
     public $field_name;
     public $field_slug;
