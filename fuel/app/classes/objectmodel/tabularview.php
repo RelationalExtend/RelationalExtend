@@ -21,9 +21,9 @@ class ObjectModel_TabularView {
     public $direction = 'asc';
     public $controller_path = "";
     public $records_not_in = array();
-	public $filter_conditions = array();
-	public $display_rules = array();
-	public $column_titles = array();
+    public $filter_conditions = array();
+    public $display_rules = array();
+    public $column_titles = array();
 
 	// Buttons
 
@@ -33,14 +33,15 @@ class ObjectModel_TabularView {
 
     private $additional_button_fields = array();
     private $additional_buttons = array();
+    private $additional_overall_buttons = array();
     private $bottom_buttons = array();
     private $add_button = null;
     private $edit_buttons = array();
     private $delete_buttons = array();
 	
-	private $bulk_action_buttons = array();
-	private $bulk_actions_enabled = false;
-	private $bulk_actions = null;
+    private $bulk_action_buttons = array();
+    private $bulk_actions_enabled = false;
+    private $bulk_actions = null;
 
 	// Database functionality
 
@@ -48,7 +49,7 @@ class ObjectModel_TabularView {
     private $id_field;
     private $thumbnail_field;
     private $description_field;
-	private $additional_fields = array();
+    private $additional_fields = array();
 
     private $records;
     private $sort_field = "";
@@ -146,6 +147,21 @@ class ObjectModel_TabularView {
             return;
 
         $this->additional_button_fields = $additional_buttons;
+    }
+    
+    /**
+     * Set up additional overall buttons
+     * 
+     * @param type $additional_buttons
+     * @return type
+     */
+    
+    public function set_additional_overall_buttons($additional_buttons)
+    {
+        if(!is_array($additional_buttons))
+            return;
+
+        $this->additional_overall_buttons = $additional_buttons;
     }
 	
 	/**
@@ -289,16 +305,31 @@ class ObjectModel_TabularView {
             if($this->add_button_visible)
                 $this->bottom_buttons = array($this->add_button);
 			
-			if($this->is_bulk_actions_enabled())
-			{
-				$this->bulk_actions = "";
-				
-				foreach($this->bulk_action_buttons as $button)
-				{
-					$this->bulk_actions.= AdminHelpers::build_bootstrap_submit_button($button);
-				}
-			}
-        }
+                if($this->is_bulk_actions_enabled())
+                {
+                        $this->bulk_actions = "";
+
+                        foreach($this->bulk_action_buttons as $button)
+                        {
+                                $this->bulk_actions.= AdminHelpers::build_bootstrap_submit_button($button);
+                        }
+                }
+            }
+            
+            // Add overall buttons
+            
+            if(is_array($this->additional_overall_buttons))
+            {
+                if(!is_array($this->bottom_buttons))
+                {
+                    $this->bottom_buttons = array();
+                }
+                
+                foreach($this->additional_overall_buttons as $additional_button_key => $additional_button_value)
+                {
+                    $this->bottom_buttons[] = AdminHelpers::build_bootstrap_button($this->controller_path, $additional_button_value , $additional_button_key);
+                }
+            }
 
         return $this->record_objects;
     }
@@ -325,14 +356,14 @@ class ObjectModel_TabularView {
         return $this->bottom_buttons;
     }
 	
-	/**
-	 * Returns the additional fields in the tablular view
-	 * 
-	 * @return array
-	 */
-	
-	public function get_additional_fields()
-	{
-		return $this->additional_fields;
-	}
+    /**
+     * Returns the additional fields in the tablular view
+     * 
+     * @return array
+     */
+
+    public function get_additional_fields()
+    {
+        return $this->additional_fields;
+    }
 }

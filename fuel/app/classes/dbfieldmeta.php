@@ -42,7 +42,7 @@ class DBFieldMeta {
 	
 	// Core controls array
 	
-	const CONTROL_ARRAY = array(
+	public static $CONTROL_ARRAY = array(
 		self::CONTROL_SIMPLE_TEXT => "Simple Text Box",
 		self::CONTROL_NUMERIC => "Numeric Box",
 		self::CONTROL_CALENDAR => "Calendar",

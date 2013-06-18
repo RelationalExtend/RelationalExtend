@@ -13,6 +13,9 @@ class ObjectModel_FormView {
     public $form_action;
     public $return_path = "";
     public $record_id = 0;
+    
+    // Adding additional fields to the form - for processing purposes
+    public $additional_form_hidden_fields = array();
 
     public $div_container_class = "";
     public $div_content_class = "";
@@ -23,7 +26,7 @@ class ObjectModel_FormView {
 
     private $records = null;
 	
-	public static $last_insert_id = 0;
+    public static $last_insert_id = 0;
 
     /**
      * Constructor
@@ -112,22 +115,22 @@ class ObjectModel_FormView {
                 case DBFieldMeta::CONTROL_TABULAR_LIST:
                     $value_to_set = Input::post($object_meta_data_item->object_meta_slug);
                     break;
-				case DBFieldMeta::CONTROL_MULTISELECT:
-					$selected_values = Input::post($object_meta_data_item->object_meta_slug);
-					$table_name = Input::post("checkbox_".$object_meta_data_item->object_meta_slug);
-					
-					if(!is_array($selected_values))
-						$selected_values = array();
-					
-					$value_to_set = "($table_name)|".implode("|", $selected_values);
-					break;
+                case DBFieldMeta::CONTROL_MULTISELECT:
+                        $selected_values = Input::post($object_meta_data_item->object_meta_slug);
+                        $table_name = Input::post("checkbox_".$object_meta_data_item->object_meta_slug);
+
+                        if(!is_array($selected_values))
+                            $selected_values = array();
+
+                        $value_to_set = "($table_name)|".implode("|", $selected_values);
+                        break;
                 case DBFieldMeta::CONTROL_CHECKBOX:
                     $value_to_set = isset($_POST[$object_meta_data_item->object_meta_slug]) ? 1 : 0;
                     break;
                 case DBFieldMeta::CONTROL_HIDDEN:
 					
-					$value_sets = array('object_name' => $object);
-					$value_sets = array_merge(Input::post(), $value_sets);
+                    $value_sets = array('object_name' => $object);
+                    $value_sets = array_merge(Input::post(), $value_sets);
 					
                     $value_to_set = $controller->special_field_operation($object, $object_meta_data_item->object_meta_slug, $value_sets);
                         
@@ -148,11 +151,12 @@ class ObjectModel_FormView {
                     }
 
                     break;
-				case DBFieldMeta::CONTROL_CUSTOM:
-					$custom_control = new \CustomControls\CustomControls();
-					$custom_control->set_meta_data($object, $object_meta_data, $controller);
-					$value_to_set = $custom_control->control_value();
-					break;
+                case DBFieldMeta::CONTROL_CUSTOM:
+                        $custom_control = new \customcontrols\CustomControls(
+                            $object_meta_data_item->object_meta_slug, 
+                            $object_meta_data_item->object_meta_values);
+                        $value_to_set = $custom_control->control_value();
+                        break;
             }
 
             if(!$skip_control)

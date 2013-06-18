@@ -26,6 +26,7 @@
 
 	<form action = "<?php echo($controller_path."bulkactions"); ?>" method = "post">
 		<input type="hidden" name="return_path" value="<?php echo($return_path); ?>" />
+                <input type="hidden" name="object" value ="<?php echo($object); ?>" />
 	    <table class="table">
 	        <thead>
 	            <tr>

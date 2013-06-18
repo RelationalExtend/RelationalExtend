@@ -9,6 +9,18 @@
                 <input type="hidden" name="record_id" value="<?php echo($record_id); ?>"/>
                 <input type="hidden" name="object" value="<?php echo($object); ?>"/>
                 <input type="hidden" name="return_path" value="<?php echo($return_path); ?>"/>
+                
+<?php 
+    if(isset($form_view->additional_form_hidden_fields))
+    {
+        foreach($form_view->additional_form_hidden_fields as $additional_form_hidden_field_key => $additional_form_hidden_field_value)
+        {
+?>
+                <input type="hidden" name="<?php echo($additional_form_hidden_field_key); ?>" value="<?php echo($additional_form_hidden_field_value); ?>"/>
+<?php
+        }
+    }
+?>
 <?php
 
     $num_rows = count($page_rows);

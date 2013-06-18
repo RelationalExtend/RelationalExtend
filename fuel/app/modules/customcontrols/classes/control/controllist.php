@@ -7,6 +7,8 @@ class Control_controllist
 	// Member variables
 	private $control_name;
 	private $control_values;
+        
+        private $preset_value;
 	
 	/**
 	 * Constructor
@@ -14,10 +16,11 @@ class Control_controllist
 	 * @param $object_meta_data
 	 */
 	 
-	public function __construct($control_name, $control_values)
+	public function __construct($control_name = null, $control_values = null)
 	{
 		$this->control_name = $control_name;
 		$this->control_values = $control_values;
+                $this->preset_value = null;
 	}
 	
 	/**
@@ -42,8 +45,22 @@ class Control_controllist
 	
 	public function control_value()
 	{
-		return Input::post($this->control_name, null);
+		return \Fuel\Core\Input::post($this->control_name, null);
 	}
+        
+        /**
+         * Presets the control's value
+         * 
+         * @param type $values
+         */
+        
+        public function preset_values($values)
+        {
+            if($values != null)
+            {
+                $this->preset_value = $values;
+            }
+        }
 	
 	/**
 	 * Render the control
@@ -53,7 +70,7 @@ class Control_controllist
 	
 	public function render_control()
 	{
-		$core_controls = \DBFieldMeta::CONTROL_ARRAY;
+		$core_controls = \DBFieldMeta::$CONTROL_ARRAY;
 		$custom_controls = CustomControls::get_custom_controls();
 		$list_values = array();
 		
@@ -71,7 +88,7 @@ class Control_controllist
 		
 		foreach($list_values as $list_value_key => $list_value_value)
 		{
-			$control_output.="<option value='$list_value_key'>$list_value_value</option>";
+			$control_output.="<option value='$list_value_key'".($list_value_key == $this->preset_value ? " selected" : "").">$list_value_value</option>";
 		}
 		
 		$control_output.="</select>";

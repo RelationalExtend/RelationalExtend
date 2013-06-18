@@ -7,7 +7,7 @@ class CustomControls
 	// Member variables
 	
 	private $control_name;
-	private $control_values;
+	private $values_array;
 	private $control_type;
 	
 	/**
@@ -15,14 +15,16 @@ class CustomControls
 	 */
 	
 	public function __construct($control_name = null, $control_values = null)
-	{	
-		if($control_values != null)
-		{
-			$this->values_array = explode($control_values, "|");
-			
-			if(is_array($control_values))
-				$this->control_type = $this->values_array[0];
-		}
+	{
+            $this->control_name = $control_name;
+            
+            if($control_values != null)
+            {
+                $this->values_array = explode("|", $control_values);
+                
+                if(is_array($this->values_array))
+                    $this->control_type = $this->values_array[0];
+            }
 	}
 	
 	/**
@@ -31,12 +33,13 @@ class CustomControls
 	 * @return string to render
 	 */
 	
-	public function render_control()
+	public function render_control($preset_values = null)
 	{
-		$control_class_name = "Control_".$this->control_type;
-		$control_object = new $control_class_name($this->control_name, $this->values_array);
-		
-		return $control_object->render_control();
+            $control_class_name = "\\customcontrols\\Control_".$this->control_type;
+            $control_object = new $control_class_name($this->control_name, $this->values_array);
+
+            $control_object->preset_values($preset_values);
+            return $control_object->render_control();
 	}
 	
 	/**
@@ -47,7 +50,7 @@ class CustomControls
 	
 	public function control_value()
 	{
-		$control_class_name = "Control_".$this->control_type;
+		$control_class_name = "\\customcontrols\\Control_".$this->control_type;
 		$control_object = new $control_class_name($this->control_name, $this->values_array);
 		
 		return $control_object->control_value();
@@ -73,8 +76,8 @@ class CustomControls
 				if(strripos($file, ".php", -4))
 				{
 					$current_control_id = str_replace(".php", "", $file);
-					$class_name = "\\customcontrol\\Control_".str_replace(".php", "", $file);
-					$object = new $class_name(null);
+					$class_name = "\\customcontrols\\Control_".str_replace(".php", "", $file);
+					$object = new $class_name();
 					$control_info[$current_control_id] = $object->info();
 				}
 			}

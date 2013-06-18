@@ -311,12 +311,12 @@ class Controller_Admin extends Controller_Template {
         $record_array = $tabular_view_descriptor->execute();
 
         $view = View::forge("admin/partials/table-view", array("table_rows" => $record_array,
-             "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
-             "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
-             "return_path" => $tabular_view_descriptor->return_path, "additional_fields" => $tabular_view_descriptor->get_additional_fields(),
-			 "column_titles" => $tabular_view_descriptor->column_titles, "bulk_actions_enabled" => $tabular_view_descriptor->is_bulk_actions_enabled(),
-			 "bulk_actions" => $tabular_view_descriptor->get_bulk_actions(), "controller_path" => Uri::base().$this->controller_path,
-			 "return_path" => $tabular_view_descriptor->return_path));
+            "page_title" => $tabular_view_descriptor->page_title, "page_title_content" => $tabular_view_descriptor->page_content,
+            "bottom_buttons" => $tabular_view_descriptor->get_bottom_buttons(), "pagination_records" => $pagination_records,
+            "return_path" => $tabular_view_descriptor->return_path, "additional_fields" => $tabular_view_descriptor->get_additional_fields(),
+            "column_titles" => $tabular_view_descriptor->column_titles, "bulk_actions_enabled" => $tabular_view_descriptor->is_bulk_actions_enabled(),
+            "bulk_actions" => $tabular_view_descriptor->get_bulk_actions(), "controller_path" => Uri::base().$this->controller_path,
+            "return_path" => $tabular_view_descriptor->return_path, "object" => $tabular_view_descriptor->get_table_name()));
 
         return $view;
     }
@@ -368,14 +368,30 @@ class Controller_Admin extends Controller_Template {
         $form_view->page_content = $page_content;
         $form_view->form_action = rtrim($form_action, "/")."/?return=".$return_path;
         $form_view->preset_form_fields = $this->preset_form_fields($table_slug);
+        
+        // Call pre render hook
+        $this->modify_form_view($form_view);
 
+        // Construct the view
         $view = View::forge("admin/partials/record-view", array("page_rows" => $form_view->get_object_meta_data(),
                     "record_id" => $record_id, "page_title" => $page_title, "page_title_content" => $page_content,
                     "form_action" => Uri::base().$this->controller_path.$form_view->form_action, "object" => $table_slug,
                     "record" => $form_view->get_records(), "form_values" => $form_view->preset_form_fields,
-                    "return_path" => $form_view->return_path));
+                    "form_view" => $form_view, "return_path" => $form_view->return_path));
 
         return $view;
+    }
+    
+    /**
+     * Modify the form view that gets passed to the form
+     * 
+     * @param type $form_view
+     * @return null
+     */
+    
+    protected function modify_form_view(&$form_view)
+    {
+        return null;
     }
 
     /**
