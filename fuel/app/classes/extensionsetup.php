@@ -184,37 +184,46 @@ class ExtensionSetup {
      * @param $tables
      * @return void
      */
-    public function uninstall($extension_id, $tables)
+    public function uninstall($extension_id, $tables, $delete_extension = true, 
+        $delete_tables = true)
     {
         DB::start_transaction();
 
-        if(!is_array($tables)) {
+        if(!is_array($tables) && $delete_tables) {
             throw new Exception_Setup("Tables specified are not in an array");
         }
 
         $table_prefix = Config::get("db.table_prefix");
 
-        // Delete meta data
-        DB::delete(self::EXTENSION_TABLE)->where("extension_id", "=", $extension_id)->execute();
+        // Did we want to delete the extension itsself?
+        if($delete_extension)
+        {
+            // Delete meta data
+            DB::delete(self::EXTENSION_TABLE)->where("extension_id", "=", $extension_id)->execute();
 
-        $db_objects = DB::select("object_id")->from(self::EXTENSION_OBJECTS_TABLE)
-                ->where("extension_id", "=", $extension_id)->as_object()->execute();
+            $db_objects = DB::select("object_id")->from(self::EXTENSION_OBJECTS_TABLE)
+                    ->where("extension_id", "=", $extension_id)->as_object()->execute();
 
-        foreach($db_objects as $db_object) {
-            DB::delete(self::EXTENSION_OBJECTS_META_TABLE)->where("object_id", "=", $db_object->object_id)->execute();
+            foreach($db_objects as $db_object) {
+                DB::delete(self::EXTENSION_OBJECTS_META_TABLE)->where("object_id", "=", $db_object->object_id)->execute();
+            }
+
+            DB::delete(self::EXTENSION_OBJECTS_TABLE)->where("extension_id", "=", $extension_id)->execute();
+
+            // Delete extension settings
+
+            DB::delete(self::EXTENSION_SETTINGS_TABLE)->where("extension_setting_extension_id", "=", $extension_id)->execute();
         }
-
-        DB::delete(self::EXTENSION_OBJECTS_TABLE)->where("extension_id", "=", $extension_id)->execute();
-
-        // Delete extension settings
-
-        DB::delete(self::EXTENSION_SETTINGS_TABLE)->where("extension_setting_extension_id", "=", $extension_id)->execute();
-
-        // Delete / Drop tables
-        foreach($tables as $table) {
-            DBUtil::drop_table($table_prefix.$table);
+        
+        // Did we want to delete tables?
+        if($delete_tables)
+        {
+            // Delete / Drop tables
+            foreach($tables as $table) {
+                DBUtil::drop_table($table_prefix.$table);
+            }
         }
-
+        
         DB::commit_transaction();
     }
 }

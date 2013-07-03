@@ -54,28 +54,44 @@ class Controller_CMS extends \Controller_Admin {
         );
     }
 	
-	/**
-	 * Enforce permission for current user
-	 * 
-	 * @param $permission_slug
-	 */
-	
-	protected function enforce_permission($permission_slug, $force_slug = true)
-	{
-		$permission_slugified = $permission_slug;
-		
-		if($force_slug)
-			$permission_slugified = \Utility::slugify($permission_slugified);
-		
-		if(!\Permissions::is_user_permitted($this->user_id, $permission_slugified))
-			\Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."unauthorizedaccess");
-	}
-	
-	/**
-	 * Controller initialization
-	 */
+    /**
+     * Enforce permission for current user
+     * 
+     * @param $permission_slug
+     */
 
-   	public function before()
+    protected function enforce_permission($permission_slug, $force_slug = true)
+    {
+        $permission_slugified = $permission_slug;
+
+        if($force_slug)
+            $permission_slugified = \Utility::slugify($permission_slugified);
+
+        if(!\Permissions::is_user_permitted($this->user_id, $permission_slugified))
+            \Fuel\Core\Response::redirect(\Fuel\Core\Uri::base().$this->controller_path."unauthorizedaccess");
+    }
+    
+    /**
+     * Checks to see if user is permitted to do something specific
+     * 
+     * @param $permission_slug
+     */
+
+    protected function is_permitted($permission_slug, $force_slug = true)
+    {
+        $permission_slugified = $permission_slug;
+
+        if($force_slug)
+            $permission_slugified = \Utility::slugify($permission_slugified);
+
+        return \Permissions::is_user_permitted($this->user_id, $permission_slugified);
+    }
+	
+    /**
+     * Controller initialization
+     */
+
+    public function before()
     {
     	\Config::load("cms::msh", "msh");
     	$this->msh_site = \Config::get("msh.msh_status");
@@ -83,29 +99,29 @@ class Controller_CMS extends \Controller_Admin {
         parent::before();
     }
 	
-	/**
-	 * MSH landing page action
-	 */
-	
-	public function admin_mshlanding()
-	{
-		$this->check_access_level_content();
-		$this->build_admin_interface(
-        	\Fuel\Core\View::forge("admin/msh-dashboard")
+    /**
+     * MSH landing page action
+     */
+
+    public function admin_mshlanding()
+    {
+        $this->check_access_level_content();
+        $this->build_admin_interface(
+            \Fuel\Core\View::forge("admin/msh-dashboard")
         );
-	}
+    }
 	
-	/**
-	 * Custom landing page function
-	 */
-	
-	public function admin_customlanding()
-	{
-		$this->check_access_level_content();
-		$this->build_admin_interface(
-        	\Fuel\Core\View::forge("admin/custom-dashboard")
+    /**
+     * Custom landing page function
+     */
+
+    public function admin_customlanding()
+    {
+        $this->check_access_level_content();
+        $this->build_admin_interface(
+            \Fuel\Core\View::forge("admin/custom-dashboard")
         );
-	}
+    }
 	
 	/**
 	 * Landing page action override

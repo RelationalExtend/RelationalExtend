@@ -55,6 +55,20 @@ class CustomControls
 		
 		return $control_object->control_value();
 	}
+    
+    /**
+	 * Returns the value of the control field type
+	 * 
+	 * @return the control's field type
+	 */
+	
+	public function control_field_type()
+	{
+		$control_class_name = "\\customcontrols\\Control_".$this->control_type;
+		$control_object = new $control_class_name($this->control_name, $this->values_array);
+		
+		return $control_object->control_field_type();
+	}
 	
 	/**
 	 * Gets a list of all custom controls

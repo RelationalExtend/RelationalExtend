@@ -48,19 +48,19 @@ class Control_controllist
 		return \Fuel\Core\Input::post($this->control_name, null);
 	}
         
-        /**
-         * Presets the control's value
-         * 
-         * @param type $values
-         */
-        
-        public function preset_values($values)
+    /**
+     * Presets the control's value
+     * 
+     * @param type $values
+     */
+
+    public function preset_values($values)
+    {
+        if($values != null)
         {
-            if($values != null)
-            {
-                $this->preset_value = $values;
-            }
+            $this->preset_value = $values;
         }
+    }
 	
 	/**
 	 * Render the control
@@ -95,6 +95,17 @@ class Control_controllist
 		
 		return $control_output;
 	}
+    
+    /**
+     * Gets the field type
+     * 
+     * @return string
+     */
+    
+    public function control_field_type()
+    {
+        return "VARCHAR (20)";
+    }
 	
 	/**
 	 * An array of custom control parameters

@@ -63,6 +63,17 @@ class Control_sample
 			</select>
 			";
 	}
+    
+    /**
+     * Gets the field type
+     * 
+     * @return string
+     */
+    
+    public function control_field_type()
+    {
+        return "INT";
+    }
 	
 	/**
 	 * An array of custom control parameters
