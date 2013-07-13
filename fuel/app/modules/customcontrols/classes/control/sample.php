@@ -16,8 +16,8 @@ class Control_sample
 	 
 	public function __construct($control_name = null, $control_values = null)
 	{
-            $this->control_name = $control_name;
-            $this->control_values = $control_values;
+        $this->control_name = $control_name;
+        $this->control_values = $control_values;
 	}
 	
 	/**
@@ -28,10 +28,10 @@ class Control_sample
 	
 	public function info()
 	{
-            return array(
-                "control_name" => "Sample control",
-                "control_desctiption" => "Demonstrates custom controls",
-            );
+        return array(
+            "control_name" => "Sample control",
+            "control_desctiption" => "Demonstrates custom controls",
+        );
 	}
 	
 	/**
@@ -63,6 +63,20 @@ class Control_sample
 			</select>
 			";
 	}
+    
+    /**
+     * Presets the control's value
+     * 
+     * @param type $values
+     */
+
+    public function preset_values($values)
+    {
+        if($values != null)
+        {
+            $this->preset_value = $values;
+        }
+    }
     
     /**
      * Gets the field type

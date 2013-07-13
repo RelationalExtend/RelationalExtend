@@ -8,7 +8,7 @@ class Control_controllist
 	private $control_name;
 	private $control_values;
         
-        private $preset_value;
+    private $preset_value;
 	
 	/**
 	 * Constructor
@@ -70,25 +70,34 @@ class Control_controllist
 	
 	public function render_control()
 	{
-		$core_controls = \DBFieldMeta::$CONTROL_ARRAY;
-		$custom_controls = CustomControls::get_custom_controls();
-		$list_values = array();
-		
+        // Include core controls?
+        
+        /*
+        $core_controls = \DBFieldMeta::$CONTROL_ARRAY;
+        
 		foreach($core_controls as $core_control_key => $core_control_value)
 		{
 			$list_values[$core_control_key] = $core_control_value;
 		}
+        */
+        
+		$custom_controls = CustomControls::get_custom_controls();
+		$list_values = array();
+		
+        
 		
 		foreach($custom_controls as $custom_control_key => $custom_control_value)
 		{
-			$list_values[$custom_control_key] = $custom_control_value["control_name"];
+            $list_values[$custom_control_key] = $custom_control_value["control_name"];
 		}
 		
 		$control_output = "<select name='".$this->control_name."'>";
 		
 		foreach($list_values as $list_value_key => $list_value_value)
 		{
-			$control_output.="<option value='$list_value_key'".($list_value_key == $this->preset_value ? " selected" : "").">$list_value_value</option>";
+            // Do not include the self control (this control)
+            if($list_value_key != "controllist")
+                $control_output.="<option value='$list_value_key'".($list_value_key == $this->preset_value ? " selected" : "").">$list_value_value</option>";
 		}
 		
 		$control_output.="</select>";

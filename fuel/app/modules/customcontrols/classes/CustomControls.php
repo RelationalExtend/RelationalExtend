@@ -11,21 +11,43 @@ class CustomControls
 	private $control_type;
 	
 	/**
-	 * Consructor
+	 * Constructor
 	 */
 	
-	public function __construct($control_name = null, $control_values = null)
+	public function __construct($control_name = null, $control_values = null, 
+        $preset_type = true)
 	{
-            $this->control_name = $control_name;
-            
-            if($control_values != null)
-            {
-                $this->values_array = explode("|", $control_values);
-                
-                if(is_array($this->values_array))
-                    $this->control_type = $this->values_array[0];
-            }
+        $this->control_name = $control_name;
+
+        if($control_values != null)
+        {
+            $this->values_array = explode("|", $control_values);
+
+            if(is_array($this->values_array) && $preset_type)
+                $this->control_type = $this->values_array[0];
+        }
 	}
+    
+    /**
+     * Set control type
+     * 
+     * @param type $control_type
+     */
+    public function set_control_type($control_type)
+    {
+        $this->control_type = $control_type;
+    }
+    
+    /**
+     * Set control values
+     * 
+     * @param type $values_array
+     */
+    
+    public function set_control_valus($values_array)
+    {
+        $this->values_array = $values_array;
+    }
 	
 	/**
 	 * Draws the control
@@ -35,11 +57,11 @@ class CustomControls
 	
 	public function render_control($preset_values = null)
 	{
-            $control_class_name = "\\customcontrols\\Control_".$this->control_type;
-            $control_object = new $control_class_name($this->control_name, $this->values_array);
+        $control_class_name = "\\customcontrols\\Control_".$this->control_type;
+        $control_object = new $control_class_name($this->control_name, $this->values_array);
 
-            $control_object->preset_values($preset_values);
-            return $control_object->render_control();
+        $control_object->preset_values($preset_values);
+        return $control_object->render_control();
 	}
 	
 	/**
