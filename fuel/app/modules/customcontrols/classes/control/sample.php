@@ -42,7 +42,7 @@ class Control_sample
 	
 	public function control_value()
 	{
-		return Input::post($this->control_name, null);
+		return \Fuel\Core\Input::post($this->control_name, null);
 	}
 	
 	/**
